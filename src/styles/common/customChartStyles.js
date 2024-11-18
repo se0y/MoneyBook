@@ -1,4 +1,4 @@
-// src/styles/monthlyStatics/monthlyChartStyles.js
+// src/styles/common/customChartStyles.js
 
 import { StyleSheet } from 'react-native';
 
@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
     top: -10,
     textAlign: 'center',
     width: 40,
-    transform: [{ translateX: 0 }], // 막대의 중앙으로 이동
   },
 });
 

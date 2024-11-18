@@ -1,4 +1,4 @@
-// src/styles/monthlyStatics/amountCompareSectionStyles.js
+// src/styles/common/amountDetailStyles.js
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({

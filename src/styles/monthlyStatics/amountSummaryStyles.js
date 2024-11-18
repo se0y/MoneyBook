@@ -9,7 +9,7 @@ export default StyleSheet.create({
     marginBottom: 5,
   },
   container: {
-    alignItems: 'center',
+    alignItems: 'right',
     marginHorizontal: 25, // 중앙 배치를 위해 여백 조정
   },
   labelContainer: {

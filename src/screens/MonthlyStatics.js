@@ -2,45 +2,49 @@
 import React from 'react';
 import { View, FlatList } from 'react-native';
 import AmountSummary from '../components/monthlyStatics/AmountSummary';
-import MonthlyStaticsHeader from '../components/monthlyStatics/MonthlyStaticsHeader';
+import Header from '../components/common/Header';
 import BudgetIndicator from '../components/monthlyStatics/BudgetIndicator';
-import MonthlyChart from '../components/monthlyStatics/MonthlyChart';
-import AmountDetail from '../components/monthlyStatics/AmountDetail';
+import MonthlyChart from '../components/common/CustomChart';
+import AmountDetail from '../components/common/AmountDetail';
+import LineIcon from '../asset/MonthlyStaticsLine.svg';
 import styles from '../styles/monthlyStatics/monthlyStaticsStyles';
 
 const MonthlyStatics = () => {
-  // 데이터 배열을 만들어 FlatList로 렌더링할 컴포넌트들을 배열 요소로 정의합니다.
+  const chartData = [
+    { label: '1월', income: 12000, expense: 8000 },
+    { label: '2월', income: 4000, expense: 7000 },
+    { label: '3월', income: 8000, expense: 1000 },
+    { label: '4월', income: 10000, expense: 5000 },
+    { label: '5월', income: 15000, expense: 12000 },
+    { label: '6월', income: 2000, expense: 500 },
+    { label: '7월', income: 12000, expense: 8000 },
+    { label: '8월', income: 4000, expense: 7000 },
+    { label: '9월', income: 8000, expense: 1000 },
+    { label: '10월', income: 10000, expense: 5000 },
+    { label: '11월', income: 15000, expense: 12000 },
+    { label: '12월', income: 2000, expense: 500 },
+  ];
+
   const sections = [
-    { key: 'header', component: <MonthlyStaticsHeader title="나의 월별 통계" /> },
     {
-      // 월별 잔액, 지출 요약
       key: 'summary',
       component: (
         <View style={styles.summaryContainer}>
-          <AmountSummary
-            label="총 잔액"
-            amount={2500000}
-            isIncome={true}
-          />
-          <AmountSummary
-            label="총 지출"
-            amount={5000}
-            isIncome={false}
-          />
+          <AmountSummary label="총 잔액" amount={2500000} isIncome={true} />
+          <LineIcon height={47} style={styles.lineIcon} />
+          <AmountSummary label="총 지출" amount={5000} isIncome={false} />
         </View>
       ),
     },
     {
-      // 예산 사용 결과
       key: 'budget',
       component: <BudgetIndicator percentage={30} totalAmount={300000} />,
     },
     {
-      // 수입, 지출 여부와 날짜에 따른 목록
       key: 'chart',
       component: (
         <View style={styles.roundedContainer}>
-          <MonthlyChart />
+          <MonthlyChart chartData={chartData} />
           <AmountDetail
             income={1600000}
             incomeChange={10000}
@@ -53,12 +57,15 @@ const MonthlyStatics = () => {
   ];
 
   return (
-    <FlatList
-      data={sections}
-      keyExtractor={(item) => item.key}
-      renderItem={({ item }) => item.component}
-      contentContainerStyle={styles.container} // styles.container 스타일 적용
-    />
+    <View style={styles.container}>
+      <Header title="나의 월별 통계" /> {/* Header 수정 */}
+      <FlatList
+        data={sections}
+        keyExtractor={(item) => item.key}
+        renderItem={({ item }) => item.component}
+        contentContainerStyle={styles.container}
+      />
+    </View>
   );
 };
 
