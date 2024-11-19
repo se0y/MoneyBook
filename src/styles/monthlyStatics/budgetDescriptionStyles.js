@@ -4,7 +4,6 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   budgetTextContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginTop: 5,
   },
   budgetText: {
