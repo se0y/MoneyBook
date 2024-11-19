@@ -22,7 +22,7 @@ export default StyleSheet.create({
     borderTopRightRadius: 50,
     padding: 40,
     marginTop: 20,
-    minHeight: height, // 화면 높이 설정
+    minHeight: height*1.5, // 화면 높이 설정
   },
   lineIcon: {
       marginHorizontal: 10, // 좌우 여백 추가로 AmountSummary와 간격 유지

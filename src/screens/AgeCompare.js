@@ -60,6 +60,9 @@ const AgeCompare = () => {
     setChartData(fetchChartData());
     setSummaryData(fetchSummaryData());
     setIsConfirmed(true); // 데이터 확인 상태로 변경
+
+    console.log("연령대별 지출 비교 선택 날짜: "+selectedDate);
+    console.log("연령대별 지출 비교 내 나이: "+age);
   };
 
   // 캘린더에서 날짜 선택 완료 시

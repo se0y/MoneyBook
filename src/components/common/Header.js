@@ -20,7 +20,7 @@ const Header = ({ title }) => {
           navigation.navigate('Menu');
         }}
       >
-        <MenuIcon /> // 메뉴 아이콘
+        <MenuIcon /> {/* 메뉴 아이콘 */}
       </TouchableOpacity>
 
       {/* 헤더 제목 */}
@@ -30,3 +30,4 @@ const Header = ({ title }) => {
 };
 
 export default Header;
+

@@ -25,3 +25,4 @@ export default StyleSheet.create({
     color: '#000', // 검은색 텍스트
   },
 });
+

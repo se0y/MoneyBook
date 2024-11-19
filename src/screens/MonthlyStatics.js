@@ -1,4 +1,6 @@
 // src/screens/MonthlyStatics.js
+// 월별 통계 페이지
+
 import React from 'react';
 import { View, FlatList } from 'react-native';
 import AmountSummary from '../components/monthlyStatics/AmountSummary';
