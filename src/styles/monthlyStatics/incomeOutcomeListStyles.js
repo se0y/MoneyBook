@@ -1,4 +1,4 @@
-// src/styles/monthlyStatics/incomeExpenseListStyles.js
+// src/styles/monthlyStatics/incomeOutcomeListStyles.js
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({

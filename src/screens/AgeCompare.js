@@ -108,7 +108,7 @@ const AgeCompare = () => {
             </View>
             <AmountDetail
               income={summaryData.myExpense}
-              expense={summaryData.peerExpense}
+              outcome={summaryData.peerExpense}
               isAgeCompare={true} // AgeCompare 페이지에서 사용
               incomeLabel="내 지출"
               expenseLabel="또래 지출"

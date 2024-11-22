@@ -28,8 +28,10 @@ const MenuBar = () => {
       {/* 메뉴 외부 클릭 시 닫힘 */}
       <View style={styles.overlay}>
         <TouchableWithoutFeedback>
+
           {/* 메뉴 내부 클릭 방지 */}
           <View style={styles.menuContainer}>
+
             {/* 상단 사용자 정보 */}
             <View style={styles.header}>
               <FontAwesomeIcon icon={faUsers} size={40} color="#fff" style={styles.icon} />
@@ -39,26 +41,32 @@ const MenuBar = () => {
 
             {/* 메뉴 아이템 목록 */}
             <View style={styles.menuList}>
+
               <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuClick('Calendar')}>
                 <FontAwesomeIcon icon={faCalendarAlt} size={24} color="#fff" />
                 <Text style={styles.menuText}>캘린더</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuClick('MonthlyStatics')}>
                 <FontAwesomeIcon icon={faChartBar} size={24} color="#fff" />
                 <Text style={styles.menuText}>나의 월별 통계</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuClick('AgeCompare')}>
                 <FontAwesomeIcon icon={faUsers} size={24} color="#fff" />
                 <Text style={styles.menuText}>연령대별 지출 비교</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuClick('BudgetSettings')}>
                 <FontAwesomeIcon icon={faWallet} size={24} color="#fff" />
                 <Text style={styles.menuText}>이번 달 예산 설정</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuClick('CategoryCheck')}>
                 <FontAwesomeIcon icon={faThList} size={24} color="#fff" />
                 <Text style={styles.menuText}>카테고리별 확인</Text>
               </TouchableOpacity>
+
             </View>
 
             {/* 하단 로그아웃 */}
