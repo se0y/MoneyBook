@@ -111,7 +111,7 @@ const AgeCompare = () => {
               outcome={summaryData.peerExpense}
               isAgeCompare={true} // AgeCompare 페이지에서 사용
               incomeLabel="내 지출"
-              expenseLabel="또래 지출"
+              outcomeLabel="또래 지출"
             />
             <Text style={styles.note}>
               {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
