@@ -15,7 +15,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/common/menuBarStyles.js';
 
-const MenuBar = () => {
+ const MenuBar = ({ route }) => {
+  const { userName, percent } = route.params; // 매개변수 접근
   const navigation = useNavigation(); // navigation 객체 가져오기
 
   const handleMenuClick = (route) => {
@@ -28,15 +29,16 @@ const MenuBar = () => {
       {/* 메뉴 외부 클릭 시 닫힘 */}
       <View style={styles.overlay}>
         <TouchableWithoutFeedback>
-
           {/* 메뉴 내부 클릭 방지 */}
           <View style={styles.menuContainer}>
 
             {/* 상단 사용자 정보 */}
             <View style={styles.header}>
               <FontAwesomeIcon icon={faUsers} size={40} color="#fff" style={styles.icon} />
-              <Text style={styles.userText}>안녕하세요. ○○님</Text>
-              <Text style={styles.userSubText}>이번 달 목표 금액의 10%를 사용하셨어요</Text>
+              <Text style={styles.userText}>안녕하세요. {userName}님</Text>
+              <Text style={styles.userSubText}>
+                이번 달 목표 금액의 {percent}%를 사용하셨어요
+              </Text>
             </View>
 
             {/* 메뉴 아이템 목록 */}

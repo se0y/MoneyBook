@@ -45,7 +45,9 @@ const App = () => {
               presentation: 'transparentModal', // 모달로 설정
               animation: 'slide_from_left', // 왼쪽에서 오른쪽으로 슬라이드
             }}
+            initialParams={{ userName: '홍길동', percent: 25 }} // 기본 매개변수 전달
           />
+
         </Stack.Navigator>
       </NavigationContainer>
     </MonthlyStaticsProvider>

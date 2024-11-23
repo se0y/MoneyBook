@@ -215,15 +215,18 @@ const MonthlyStatics = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="나의 월별 통계" />
       <FlatList
         data={sections}
         keyExtractor={(item) => item.key}
         renderItem={({ item }) => item.component}
         contentContainerStyle={styles.container}
+        ListHeaderComponent={
+          <Header title="나의 월별 통계" />
+        }
       />
     </View>
   );
+
 };
 
 export default MonthlyStatics;

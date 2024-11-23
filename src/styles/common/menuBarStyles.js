@@ -14,7 +14,7 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: '#276749',
     width: '78%',
-    paddingVertical: 20,
+    paddingVertical: 40,
     paddingHorizontal: 15,
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
@@ -44,7 +44,7 @@ export default StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#fff',
     marginBottom: 10,
