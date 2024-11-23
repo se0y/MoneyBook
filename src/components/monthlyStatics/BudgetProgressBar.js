@@ -6,7 +6,7 @@ import { View, Text } from 'react-native';
 import ProgressBar from 'react-native-progress/Bar';
 import styles from '../../styles/monthlyStatics/budgetProgressBarStyles';
 
-const BudgetProgressBar = ({ percentage, totalAmount }) => (
+const BudgetProgressBar = ({ percentage, outcome }) => (
   <View style={styles.progressBarContainer}>
     <ProgressBar
       progress={percentage / 100}
@@ -19,7 +19,7 @@ const BudgetProgressBar = ({ percentage, totalAmount }) => (
       style={styles.progressBar}
     />
     <Text style={styles.percentageText}>{percentage}%</Text>
-    <Text style={styles.totalAmountText}>{totalAmount.toLocaleString()} 원</Text>
+    <Text style={styles.totalAmountText}>{outcome.toLocaleString()} 원</Text>
   </View>
 );
 

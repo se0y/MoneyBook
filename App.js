@@ -6,45 +6,51 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MonthlyStatics from './src/screens/MonthlyStatics';
 import AgeCompare from './src/screens/AgeCompare';
 import MenuBar from './src/screens/MenuBar';
+import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // Context 추가
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {/* 월별 통계 페이지 */}
-        <Stack.Screen
-          name="MonthlyStatics"
-          component={MonthlyStatics}
-          options={{
-            headerShown: false,
-            animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+    <MonthlyStaticsProvider> {/* Context Provider로 감싸기 */}
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false, // 기본적으로 헤더를 숨김
           }}
-        />
+        >
+          {/* 월별 통계 페이지 */}
+          <Stack.Screen
+            name="MonthlyStatics"
+            component={MonthlyStatics}
+            options={{
+              animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+            }}
+          />
 
-        {/* 연령대별 지출 비교 페이지 */}
-        <Stack.Screen
-          name="AgeCompare"
-          component={AgeCompare}
-          options={{
-            headerShown: false,
-            animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
-          }}
-        />
+          {/* 연령대별 지출 비교 페이지 */}
+          <Stack.Screen
+            name="AgeCompare"
+            component={AgeCompare}
+            options={{
+              animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+            }}
+          />
 
-        {/* 메뉴 페이지 */}
-        <Stack.Screen
-          name="Menu"
-          component={MenuBar}
-          options={{
-            presentation: 'transparentModal', // 모달로 설정
-            animation: 'slide_from_left', // 왼쪽에서 오른쪽으로 슬라이드
-            headerShown: false, // 헤더 숨김
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+          {/* 메뉴 페이지 */}
+          <Stack.Screen
+            name="Menu"
+            component={MenuBar}
+            options={{
+              presentation: 'transparentModal', // 모달로 설정
+              animation: 'slide_from_left', // 왼쪽에서 오른쪽으로 슬라이드
+            }}
+            initialParams={{ userName: '홍길동', percent: 25 }} // 기본 매개변수 전달
+          />
+
+        </Stack.Navigator>
+      </NavigationContainer>
+    </MonthlyStaticsProvider>
   );
 };
 

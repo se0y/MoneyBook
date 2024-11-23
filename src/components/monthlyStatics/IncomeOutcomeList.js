@@ -11,7 +11,7 @@ import MoneyCategory from '../../asset/category/MoneyCategory.svg';
 import EtcCategory from '../../asset/category/EtcCategory.svg';
 import IncomeIcon from '../../asset/income/IncomeColored.svg';
 import ExpenseIcon from '../../asset/expense/ExpenseColored.svg';
-import styles from '../../styles/monthlyStatics/incomeExpenseListStyles';
+import styles from '../../styles/monthlyStatics/incomeOutcomeListStyles';
 
 const categoryIcons = {
   식비: FoodCategory,
@@ -22,15 +22,15 @@ const categoryIcons = {
   기타: EtcCategory,
 };
 
-const IncomeExpenseList = ({ incomeList, expenseList, selectedType, selectedYear, selectedMonth }) => {
+const IncomeOutcomeList = ({ incomeList, outcomeList, selectedType, selectedYear, selectedMonth }) => {
   const monthName = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"][selectedMonth - 1];
   const isIncome = selectedType === 'income';
-  const dataList = isIncome ? incomeList : expenseList;
+  const dataList = isIncome ? incomeList : outcomeList;
   const listHeader = `${monthName} ${isIncome ? '수입' : '지출'}`;
   const HeaderIcon = isIncome ? IncomeIcon : ExpenseIcon;
 
    // 금액 합계를 계산
-   const totalAmount = dataList.reduce((acc, item) => acc + item.amount, 0);
+   const totalAmount = dataList.reduce((acc, item) => acc + item.money, 0);
 
    return (
        <View style={styles.container}>
@@ -63,11 +63,11 @@ const IncomeExpenseList = ({ incomeList, expenseList, selectedType, selectedYear
                      <CategoryIcon width={50} height={50} />
                    </View>
                    <View style={styles.listItemContent}>
-                     <Text style={styles.listItemTitle}>{item.title}</Text>
+                     <Text style={styles.listItemTitle}>{item.memo}</Text>
                      <Text style={styles.listItemDate}>{`${item.time} - ${new Date(item.date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}`}</Text>
                    </View>
                    <Text style={[styles.listItemAmount, isIncome ? styles.incomeAmount : styles.expenseAmount]}>
-                     {isIncome ? '+' : '-'}{item.amount.toLocaleString()}
+                     {isIncome ? '+' : '-'}{item.money.toLocaleString()}
                    </Text>
                  </View>
                );
@@ -78,4 +78,4 @@ const IncomeExpenseList = ({ incomeList, expenseList, selectedType, selectedYear
      );
    };
 
-   export default IncomeExpenseList;
+   export default IncomeOutcomeList;
