@@ -1,10 +1,21 @@
 // App.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import CalendarPage from './src/screens/CalendarPage';
+import { request, PERMISSIONS } from 'react-native-permissions';
 
 const App = () => {
+
+  useEffect(() => {
+    // 앱이 로드될 때 권한을 요청
+    const requestPermission = async () => {
+      const result = await request(PERMISSIONS.ANDROID.READ_SMS);
+      console.log('SMS 권한 요청 결과:', result); // 권한 요청 결과 확인
+    };
+    
+    requestPermission();
+  }, []);
 
   return (
       <CalendarPage />

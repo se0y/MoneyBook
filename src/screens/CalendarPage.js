@@ -11,10 +11,7 @@ import CalendarModal from '../components/CalendarBottomSheet';
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  // Firestore 데이터 불러오기
-  
+  const [isModalVisible, setIsModalVisible] = useState(false);  
 
   // 카테고리 구분
   const categoryKeywords = {
@@ -26,43 +23,123 @@ export default function CalendarPage() {
     '기타': [] // 기타
   };
 
-  // 예시 데이터 (Firestore에서 가져올 데이터 대신 사용)
-  const exampleData = {
-    '2024-11-19': {
-      income: [
-        { money: +35000, memo: '교통비 환급', time: '17:26', category: '교통' },
-      ],
-      outcome: [
-        { money: -10000, memo: 'CU 편의점', time: '21:03', category: '편의점' },
-      ],
-    },
-    '2024-11-20': {
-      income: [
-        { money: +50000, memo: '급여', time: '09:00', category: '이체' },
-      ],
-      outcome: [
-        { money: -15000, memo: '유니클로', time: '15:40', category: '쇼핑' },
-      ],
-    },
+  // 오늘 날짜 가져오기
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // "YYYY-MM-DD" 형식 반환
   };
+
+  // SMS 리스너 설정
+  useEffect(() => {
+    const subscription = SmsListener.addListener(handleNewMessage);
+    console.log('SMS 리스너가 등록되었습니다.');
+
+    const today = getTodayDate();
+    console.log(today);
+    onDateSelect(today); // 선택된 날짜를 오늘로 설정
+
+    // 컴포넌트 언마운트 시 리스너 제거
+    return () => {
+      subscription.remove();
+      console.log('SMS 리스너가 제거되었습니다.');
+    };
+  }, []);
+
+
+
+  // Firestore에서 데이터 조회
+  const fetchTransactionsByDate = async (userId="서연", date) => {
+    try {
+      const userRef = firestore().collection('Users').doc(userId);
+      const dateRef = userRef.collection(date); // 선택된 날짜의 서브컬렉션 참조
+
+      const snapshot = await dateRef.get();
+      const transactions = [];
+      // console.log('스냅샷 : ', snapshot);
+
+      // Firestore 문서를 배열로 변환
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        // 'income'과 'outcome' 배열을 합쳐서 반환
+        if (data.transactions) {
+          transactions.push(...data.transactions);
+        }
+      });
+
+      return transactions;
+    } catch (error) {
+      console.error('데이터 조회 실패 :', error);
+      return [];
+    }
+  };
+
+  // Firestore에 데이터 추가
+  const addTransaction = async (userId, date, transaction) => {
+    try {
+      const userRef = firestore().collection('Users').doc(userId);
+      const dateRef = userRef.collection(date); // 선택된 날짜의 서브컬렉션 참조
+  
+      // 양수는 'income', 음수는 'outcome' 문서에 추가
+      const docName = transaction.money > 0 ? 'income' : 'outcome';
+  
+
+      const docRef = dateRef.doc(docName);
+      // 문서에 배열 형태로 거래 내역 추가
+      await docRef.set(
+        {
+          transactions: firestore.FieldValue.arrayUnion({
+            category: transaction.category,
+            memo: transaction.memo,
+            money: transaction.money,
+            time: transaction.time,
+          })
+        },
+        { merge: true } // 문서가 없으면 생성하고, 있으면 기존 데이터에 병합
+      );
+  
+      console.log(`${docName}에 데이터 추가:`, transaction);
+    } catch (error) {
+      console.error('데이터 추가 오류:', error);
+    }
+  };
+  
+  //
 
   // 날짜 선택 시 데이터 업데이트
-  const onDateSelect = (day) => {
+  const onDateSelect = async (day) => {
     setSelectedDate(day); // 선택된 날짜 설정
-    const selectedTransactions = exampleData[day] || { income: [], outcome: [] };
-    
-    // income과 outcome 데이터를 하나의 배열로 합침
-    const allTransactions = [
-      ...selectedTransactions.income,
-      ...selectedTransactions.outcome,
-    ];
-
-    setTransactions(allTransactions);
-
+  
+    const userId = '서연'; // (유저id 받아오면 수정할 것)
+    const transactions = await fetchTransactionsByDate(userId, day); // Firestore에서 데이터 조회
+  
+    setTransactions(transactions); // 조회된 거래 내역을 상태로 설정
     // 상태가 변경되었을 때 로그 찍기
     console.log('부모 컴포넌트 선택된 날짜:', day);
-    console.log('부모 컴포넌트 현재 거래 내역:', allTransactions); // 현재 거래 내역 로그 찍기
+    console.log('부모 컴포넌트 현재 거래 내역:', transactions); // 현재 거래 내역 로그 찍기
   };
+  // const onDateSelect = (day) => {
+  //   setSelectedDate(day); // 선택된 날짜 설정
+    
+  //   const selectedTransactions = exampleData[day] || { income: [], outcome: [] };
+    
+  //   // income과 outcome 데이터를 하나의 배열로 합침
+  //   const allTransactions = [
+  //     ...selectedTransactions.income,
+  //     ...selectedTransactions.outcome,
+  //   ];
+
+  //   setTransactions(allTransactions);
+
+  //   // 상태가 변경되었을 때 로그 찍기
+  //   console.log('부모 컴포넌트 선택된 날짜:', day);
+  //   console.log('부모 컴포넌트 현재 거래 내역:', allTransactions); // 현재 거래 내역 로그 찍기
+  // };
+
+
+
 
   // 상태가 변경될 때마다 로그 찍기 위해 useEffect 사용
   // useEffect(() => {
@@ -79,13 +156,24 @@ export default function CalendarPage() {
   const closeModal = () => setIsModalVisible(false);
 
   // handleSaveTransaction 함수 정의
-  const handleSaveTransaction = (data) => {
-    console.log('저장된 데이터:', data); // 데이터를 콘솔에 출력하거나 서버에 저장
-    
-    // 선택된 날짜에 추가
-    const updatedTransactions = [...transactions, data];
-    setTransactions(updatedTransactions); // 거래 리스트 업데이트
+  // 저장 버튼 클릭 시 데이터 추가
+  const handleSaveTransaction = async (data) => {
+    const userId = '서연'; // (유저id 받아오면 수정할 것)
+    const date = selectedDate; // 선택된 날짜 
+
+    await addTransaction(userId, date, data); // Firestore에 데이터 추가
+
+    // Firestore에서 업데이트된 데이터 다시 조회
+    const updatedTransactions = await fetchTransactionsByDate(userId, date);
+    setTransactions(updatedTransactions); // 업데이트된 거래 내역으로 상태 갱신
   };
+  // const handleSaveTransaction = (data) => {
+  //   console.log('저장된 데이터:', data); // 데이터를 콘솔에 출력하거나 서버에 저장
+    
+  //   // 선택된 날짜에 추가
+  //   const updatedTransactions = [...transactions, data];
+  //   setTransactions(updatedTransactions); // 거래 리스트 업데이트
+  // };
 
   // 카테고리 분류 함수
   const categorizeTransaction = (message) => {
@@ -124,7 +212,7 @@ export default function CalendarPage() {
   };  
 
   // 수신 문자 자동 입력 
-  const handleNewMessage = (message) => {
+  const handleNewMessage = async (message) => {
     const messageBody = message.body; // 메시지 내용 (body)만 추출
     const originatingAddress = message.originatingAddress; // 발신자의 전화번호
 
@@ -147,10 +235,17 @@ export default function CalendarPage() {
 
         // 파싱된 날짜를 selectedDate로 설정
         onDateSelect(parsedData.date);
+
+        // 파이어베이스에 거래 내역 추가
+        await addTransaction('서연', parsedData.date, newTransaction);
   
-        // 날짜별로 거래 내역 추가
-        setTransactions((prev) => [...prev, newTransaction]);
-        console.log("리스트 추가:", transactions);
+        // Firestore에서 업데이트된 데이터 다시 조회
+        const updatedTransactions = await fetchTransactionsByDate('서연', parsedData.date);
+        setTransactions(updatedTransactions); // 업데이트된 거래 내역으로 상태 갱신
+
+        // // 날짜별로 거래 내역 추가
+        // setTransactions((prev) => [...prev, newTransaction]);
+        // console.log("리스트 추가:", transactions);
     } else {
       console.warn("문자 파싱 실패:", message);
     }
@@ -172,17 +267,7 @@ export default function CalendarPage() {
   
   //     setTransactions(allTransactions); // transactions 상태 업데이트
   //   }
-  // }, [selectedDate]); // selectedDate가 변경될 때마다 실행
-
-  // SMS 리스너 설정
-  useEffect(() => {
-    const subscription = SmsListener.addListener(handleNewMessage);
-
-    // 컴포넌트 언마운트 시 리스너 제거
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+  // }, [selectedDate]); // selectedDate가 변경될 때마다 실행 
   
   
 
@@ -201,7 +286,7 @@ export default function CalendarPage() {
 
       {/* 캘린더 */}
       <CalendarComponent
-        onDateSelect={onDateSelect} // 날짜 선택 시 onDateChange 함수 실행        
+        onDateSelect={onDateSelect} // 날짜 선택 시 onDateSelect 함수 실행        
       />
 
       {/* 구분선 */}
