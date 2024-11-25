@@ -28,6 +28,12 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
 
   const handleSave = () => {
     // 거래 데이터 객체를 생성하여 부모 컴포넌트로 전달
+    // 금액이 비어있으면 경고
+    if (!amount) {
+      alert('금액을 입력하세요'); // 금액이 없으면 alert 띄우기
+      return; // 금액이 없으면 저장하지 않고 종료
+    }
+
     const transactionData = {
       money: amount,
       memo: memo,
@@ -38,6 +44,13 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
 
     onSave(transactionData); // 부모 컴포넌트로 데이터 전달
     onClose(); // 모달 닫기
+
+    // 상태 초기화
+    setAmount('');
+    setMemo(''); 
+    setCategory('');
+    setTime('');
+    setDate('');
   };
 
   // 시간을 선택하는 함수
@@ -99,22 +112,28 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
           {/* 카테고리 선택 */}
           <Text style={styles.label}>카테고리</Text>
           <View style={styles.categoryContainer}>
-              <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategorySelect('편의점')}>
+              <TouchableOpacity style={[styles.categoryButton, category === '편의점' && styles.selectedCategory]} 
+                onPress={() => handleCategorySelect('편의점')}>
                 <Image source={require('../assets/ConvenienceCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategorySelect('카페')}>
+              <TouchableOpacity style={[styles.categoryButton, category === '카페' && styles.selectedCategory]} 
+                onPress={() => handleCategorySelect('카페')}>
                 <Image source={require('../assets/CafeCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategorySelect('식비')}>
+              <TouchableOpacity style={[styles.categoryButton, category === '식비' && styles.selectedCategory]} 
+                onPress={() => handleCategorySelect('식비')}>
                 <Image source={require('../assets/FoodCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.addCategoryButton} onPress={() => handleCategorySelect('이체')}>
+              <TouchableOpacity style={[styles.categoryButton, category === '이체' && styles.selectedCategory]} 
+                onPress={() => handleCategorySelect('이체')}>
                 <Image source={require('../assets/MoneyCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.addCategoryButton} onPress={() => handleCategorySelect('쇼핑')}>
+              <TouchableOpacity style={[styles.categoryButton, category === '쇼핑' && styles.selectedCategory]} 
+                onPress={() => handleCategorySelect('쇼핑')}>
                 <Image source={require('../assets/ShopCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.addCategoryButton} onPress={() => handleCategorySelect('기타')}>
+              <TouchableOpacity style={[styles.categoryButton, category === '기타' && styles.selectedCategory]} 
+                onPress={() => handleCategorySelect('기타')}>
                 <Image source={require('../assets/EctCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
             </View>
@@ -220,6 +239,13 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginHorizontal: 5,
+    },
+    selectedCategory: {
+      borderBottomWidth: 5,  // 아래쪽만 테두리 설정
+      borderBottomColor: '#2E5047', // 아래쪽 테두리 색상
+      borderTopWidth: 0,      
+      borderLeftWidth: 0,     
+      borderRightWidth: 0,    
     },
     addCategoryButton: {
       padding: 10,
