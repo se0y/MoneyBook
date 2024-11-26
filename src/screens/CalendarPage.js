@@ -17,9 +17,9 @@ export default function CalendarPage() {
   const categoryKeywords = {
     편의점: ['CU', 'GS25', '세븐일레븐', 'Emart24'], // 편의점 키워드들
     카페: ['스타벅스', '커피빈', '이디야커피', '투썸플레이스'], // 카페 키워드들
-    식당: ['피자스쿨', '맘스터치', 'BBQ', 'Kyochon'], // 식당 키워드들
+    식비: ['피자스쿨', '맘스터치', 'BBQ', 'Kyochon'], // 식비 키워드들
     쇼핑: ['롯데백화점', '신세계', '이마트', '홈플러스'], // 쇼핑몰 키워드들
-    교통: ['버스', '지하철', '택시', '카카오T'], // 교통 관련 키워드들
+    이체: ['입금', '인터넷출금', '출금'], // 이체 관련 키워드들
     '기타': [] // 기타
   };
 
@@ -120,40 +120,12 @@ export default function CalendarPage() {
     console.log('부모 컴포넌트 선택된 날짜:', day);
     console.log('부모 컴포넌트 현재 거래 내역:', transactions); // 현재 거래 내역 로그 찍기
   };
-  // const onDateSelect = (day) => {
-  //   setSelectedDate(day); // 선택된 날짜 설정
-    
-  //   const selectedTransactions = exampleData[day] || { income: [], outcome: [] };
-    
-  //   // income과 outcome 데이터를 하나의 배열로 합침
-  //   const allTransactions = [
-  //     ...selectedTransactions.income,
-  //     ...selectedTransactions.outcome,
-  //   ];
-
-  //   setTransactions(allTransactions);
-
-  //   // 상태가 변경되었을 때 로그 찍기
-  //   console.log('부모 컴포넌트 선택된 날짜:', day);
-  //   console.log('부모 컴포넌트 현재 거래 내역:', allTransactions); // 현재 거래 내역 로그 찍기
-  // };
-
-
-
-
-  // 상태가 변경될 때마다 로그 찍기 위해 useEffect 사용
-  // useEffect(() => {
-  //   console.log('부모 transactions 상태 업데이트:', transactions); // transactions 상태가 변경된 후 실행
-  // }, [transactions]); // transactions 상태가 변경될 때마다 실행
-  // useEffect(() => {
-  //   console.log('Bottom Sheet 상태 변화:', isBottomSheetVisible);
-  // }, [isBottomSheetVisible]);
-  
 
 
   // 모달 열기 및 닫기 함수
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
+
 
   // handleSaveTransaction 함수 정의
   // 저장 버튼 클릭 시 데이터 추가
@@ -167,13 +139,7 @@ export default function CalendarPage() {
     const updatedTransactions = await fetchTransactionsByDate(userId, date);
     setTransactions(updatedTransactions); // 업데이트된 거래 내역으로 상태 갱신
   };
-  // const handleSaveTransaction = (data) => {
-  //   console.log('저장된 데이터:', data); // 데이터를 콘솔에 출력하거나 서버에 저장
-    
-  //   // 선택된 날짜에 추가
-  //   const updatedTransactions = [...transactions, data];
-  //   setTransactions(updatedTransactions); // 거래 리스트 업데이트
-  // };
+
 
   // 카테고리 분류 함수
   const categorizeTransaction = (message) => {
@@ -190,8 +156,9 @@ export default function CalendarPage() {
   
   // 문자 파싱 함수
   const parseMessage = (message) => {
-    // 새로운 정규표현식 적용
-    const regex = /\[Web발신\]\s*KB국민체크\((\d+)\)\s*(.*?)\s*(\d+\/\d+)\s*(\d+:\d+)\s*([\d,]+)원\s*(.*)/;
+    console.log('파싱 함수에 들어온 메시지 :', message);
+    // 정규표현식 적용
+    const regex = /\[Web발신\]\s*KB국민체크\((\d+)\)\s*(.*?)\s*(\d+\/\d+)\s*(\d+:\d+)\s*([\d,]+)원\s*(.*?)사용/;
     
     const match = message.match(regex);
     
@@ -215,13 +182,15 @@ export default function CalendarPage() {
   const handleNewMessage = async (message) => {
     const messageBody = message.body; // 메시지 내용 (body)만 추출
     const originatingAddress = message.originatingAddress; // 발신자의 전화번호
-
+    console.log("도착한 문자 :", message);
     console.log("도착한 문자 메시지:", messageBody);
     console.log("발신자 번호:", originatingAddress);
 
-    // 특정 번호로 오는 문자만 처리
+    // 특정 번호로 오는 문자만 처리 (국민은행)
     if (originatingAddress === '0218551688') {
+      // console.log("parseMessage 호출 직전:", messageBody);
       const parsedData = parseMessage(messageBody);
+      // console.log("parseMessage 반환값:", parsedData);
       if (parsedData) {
         const newTransaction = {
           date: parsedData.date,
@@ -234,18 +203,12 @@ export default function CalendarPage() {
         console.log("메시지 키워드로 분리:", newTransaction);
 
         // 파싱된 날짜를 selectedDate로 설정
-        onDateSelect(parsedData.date);
+        setSelectedDate(parsedData.date);
 
         // 파이어베이스에 거래 내역 추가
         await addTransaction('서연', parsedData.date, newTransaction);
-  
-        // Firestore에서 업데이트된 데이터 다시 조회
-        const updatedTransactions = await fetchTransactionsByDate('서연', parsedData.date);
-        setTransactions(updatedTransactions); // 업데이트된 거래 내역으로 상태 갱신
 
-        // // 날짜별로 거래 내역 추가
-        // setTransactions((prev) => [...prev, newTransaction]);
-        // console.log("리스트 추가:", transactions);
+        onDateSelect(parsedData.date); // 문자 온 날짜로 캘린더 클릭 & 데이터 조회
     } else {
       console.warn("문자 파싱 실패:", message);
     }
@@ -253,22 +216,9 @@ export default function CalendarPage() {
     console.warn("특정 번호에서 온 메시지가 아님:", originatingAddress);
     }
   };
-
-  // 날짜 변경 시 로그 찍기
-  // useEffect(() => {
-  //   if (selectedDate) {
-  //     console.log('현재 선택된 날짜:', selectedDate);
-  //     // 날짜가 변경될 때마다 transactions 업데이트
-  //     const selectedTransactions = exampleData[selectedDate] || { income: [], outcome: [] };
-  //     const allTransactions = [
-  //       ...selectedTransactions.income,
-  //       ...selectedTransactions.outcome,
-  //     ];
-  
-  //     setTransactions(allTransactions); // transactions 상태 업데이트
-  //   }
-  // }, [selectedDate]); // selectedDate가 변경될 때마다 실행 
-  
+  // const handleNewMessage = (message) => {
+  //   console.log("새 메시지가 감지되었습니다:", message); 
+  // };  
   
 
   return (
@@ -286,7 +236,7 @@ export default function CalendarPage() {
 
       {/* 캘린더 */}
       <CalendarComponent
-        onDateSelect={onDateSelect} // 날짜 선택 시 onDateSelect 함수 실행        
+        selectedDate={selectedDate} onDateSelect={onDateSelect} // 날짜 선택 시 onDateSelect 함수 실행        
       />
 
       {/* 구분선 */}

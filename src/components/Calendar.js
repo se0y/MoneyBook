@@ -14,12 +14,11 @@ LocaleConfig.locales['ko'] = {
 LocaleConfig.defaultLocale = 'ko';
 
 
-const CalendarComponent = ({ onDateSelect }) => {
-  const [selectedDate, setSelectedDate] = useState('');
+const CalendarComponent = ({ selectedDate, onDateSelect }) => {
 
   const handleDayPress = (day) => {
     console.log(day);
-    setSelectedDate(day.dateString); // 선택된 날짜 상태 갱신
+    
     if (onDateSelect) {
       console.log('부모 컴포넌트로 날짜 전달:', day.dateString); // 2024-11-19 형식으로 전달
       onDateSelect(day.dateString);
