@@ -1,19 +1,39 @@
 // App.js
 
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { PermissionsAndroid, View, StyleSheet } from 'react-native';
 import CalendarPage from './src/screens/CalendarPage';
+import SmsListener from 'react-native-android-sms-listener';
 import { request, PERMISSIONS } from 'react-native-permissions';
 
 const App = () => {
+  const [permissionGranted, setPermissionGranted] = useState(false);
+
+  const requestPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECEIVE_SMS, // SMS 수신 권한 요청
+        {
+          title: "SMS Permission",  // 권한 요청 다이얼로그 제목
+          message: "This app needs access to your SMS messages to parse them.",  // 권한 설명
+          buttonNeutral: "Ask Me Later",  // 나중에 물어보기 버튼
+          buttonNegative: "Cancel",  // 취소 버튼
+          buttonPositive: "OK",  // 승인 버튼
+        }
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        setPermissionGranted(true);  // 권한 승인 시 상태 업데이트
+      } else {
+        Alert.alert("Permission Denied", "SMS permission is required to test.");
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
 
   useEffect(() => {
-    // 앱이 로드될 때 권한을 요청
-    const requestPermission = async () => {
-      const result = await request(PERMISSIONS.ANDROID.READ_SMS);
-      console.log('SMS 권한 요청 결과:', result); // 권한 요청 결과 확인
-    };
-    
+    // 컴포넌트가 마운트되면 권한 요청
     requestPermission();
   }, []);
 
