@@ -99,6 +99,12 @@ export default function CalendarPage() {
         },
         { merge: true } // 문서가 없으면 생성하고, 있으면 기존 데이터에 병합
       );
+
+      // availableDates에 날짜 추가
+      await userRef.set({
+        availableDates: firestore.FieldValue.arrayUnion(date)  // 중복 없이 추가
+      }, { merge: true });
+      
   
       console.log(`${docName}에 데이터 추가:`, transaction);
     } catch (error) {
@@ -106,7 +112,8 @@ export default function CalendarPage() {
     }
   };
   
-  //
+  // availableDates 추가 함수
+
 
   // 날짜 선택 시 데이터 업데이트
   const onDateSelect = async (day) => {
