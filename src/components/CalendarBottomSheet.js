@@ -10,6 +10,7 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
   const [time, setTime] = useState('');
   const [date, setDate] = useState(selectedDate || ''); // 전달받은 날짜로 초기화
   const [isTimePickerVisible, setTimePickerVisible] = useState(false); // 시간 선택기 표시 상태
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false); // 날짜 선택기 표시 상태
 
   useEffect(() => {
     if (selectedDate) {
@@ -41,11 +42,11 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
       category: category,
       date: date,
     };
-
-    onSave(transactionData); // 부모 컴포넌트로 데이터 전달
+    console.log('transactionData : ', transactionData);
+    onSave(transactionData, date); // 부모 컴포넌트로 데이터 전달
     onClose(); // 모달 닫기
 
-    // 상태 초기화
+    // 데이터 추가하고 나면 모달 입력값 초기화
     setAmount('');
     setMemo(''); 
     setCategory('');
@@ -53,7 +54,17 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
     setDate('');
   };
 
-  // 시간을 선택하는 함수
+  // 날짜 변경 함수
+  const handleChangeDate = (event, selectedDate) => {
+    if (selectedDate) {
+      const formattedDate = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+      console.log('formattedDate : ', formattedDate);
+      setDate(formattedDate); // 선택된 날짜로 상태 업데이트
+    }
+    setDatePickerVisible(false); // DateTimePicker 숨기기
+  };
+
+  // 시간 선택 함수
   const handleChangeTime = (event, selectedTime) => {
     if (selectedTime) {
       const formattedTime = `${selectedTime.getHours()}:${selectedTime.getMinutes()}`;
@@ -62,9 +73,9 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
     setTimePickerVisible(false); // DateTimePicker 숨기기
   };
 
-  const handleCancelTime = () => {
-    setTimePickerVisible(false); // DateTimePicker 숨기기
-  };
+  // const handleCancelTime = () => {
+  //   setTimePickerVisible(false); // DateTimePicker 숨기기
+  // };
 
   return (
     <Modal
@@ -94,9 +105,10 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
 
           {/* 날짜와 시간 */}
           <View style={styles.row}>
-            <View style={styles.dateTimeContainer}>
-              <TextInput style={styles.dateTimeInput} placeholder="2024.11.21" 
-                value={date} onChangeText={setDate} editable />
+          <View style={styles.dateTimeContainer}>
+              <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
+                <TextInput style={styles.dateTimeInput} value={date} editable={false} />
+              </TouchableOpacity>
               <Image source={require('../assets/calendarIcon.png')} style={styles.calendarIcon} />
             </View>
 
@@ -148,7 +160,17 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
         </View>
       </KeyboardAvoidingView>
 
-      {/* DateTimePickerModal 컴포넌트 추가 */}
+      {/* 날짜 선택기 */}
+      {isDatePickerVisible && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          display="spinner"
+          onChange={handleChangeDate}
+        />
+      )}
+
+      {/* 시간 선택기 */}
       {isTimePickerVisible && (
         <DateTimePicker
           value={new Date()}
