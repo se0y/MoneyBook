@@ -17,9 +17,9 @@ export default function CalendarPage() {
   const categoryKeywords = {
     편의점: ['CU', 'GS25', '세븐일레븐', 'Emart24'], // 편의점 키워드들
     카페: ['스타벅스', '커피빈', '이디야커피', '투썸플레이스'], // 카페 키워드들
-    식비: ['피자스쿨', '맘스터치', 'BBQ', 'Kyochon'], // 식비 키워드들
+    식비: ['피자스쿨', '맘스터치', 'BBQ', '교촌'], // 식비 키워드들
     쇼핑: ['롯데백화점', '신세계', '이마트', '홈플러스'], // 쇼핑몰 키워드들
-    이체: ['입금', '인터넷출금', '출금'], // 이체 관련 키워드들
+    이체: ['입금', '스마트폰출금', '인터넷출금', '출금'], // 이체 관련 키워드들
     '기타': [] // 기타
   };
 
@@ -156,22 +156,27 @@ export default function CalendarPage() {
   
   // 문자 파싱 함수
   const parseMessage = (message) => {
-    console.log('파싱 함수에 들어온 메시지 :', message);
+    // console.log('파싱 함수에 들어온 메시지 :', message);
     // 정규표현식 적용
-    const regex = /\[Web발신\]\s*KB국민체크\((\d+)\)\s*(.*?)\s*(\d+\/\d+)\s*(\d+:\d+)\s*([\d,]+)원\s*(.*?)사용/;
+    const regex = /\[Web발신\]\s*KB국민체크\((\d+)\)\s*(.*?)\s*(\d+\/\d+)\s*(\d+:\d+)\s*([\d,]+)원\s*(.*?)\s*(입금|사용)/;
     
     const match = message.match(regex);
     
     if (match) {
-      const memo = match[6]; // 예: CU 한성대점
+      let memo = match[6]; // 예: CU 한성대점
       const category = categorizeTransaction(memo); // 카테고리 자동 추출
+
+      // 입금/출금 문자 분리
+      const isDeposit = match[7] === '입금';
+      const amount = isDeposit ? parseInt(match[5].replace(",", ""), 10) : -parseInt(match[5].replace(",", ""), 10); // 입금 문자는 금액 양수 처리
+      const categoryForTransaction = isDeposit ? "이체" : category; // 입금 문자일 시, 카테고리 "이체"로 설정
   
       return {
         date: `2024-${match[3].replace("/", "-")}`, // 예: 2024-11-21
         time: match[4], // 예: 19:42
-        amount: parseInt(match[5].replace(",", ""), 10), // 예: 3600
+        amount: amount, // 예: 3600
         memo: memo, // 예: CU 한성대점
-        category: category // 자동으로 카테고리 설정
+        category: categoryForTransaction // 자동으로 카테고리 설정
       };
     }
   
@@ -194,7 +199,7 @@ export default function CalendarPage() {
       if (parsedData) {
         const newTransaction = {
           date: parsedData.date,
-          money: -parsedData.amount, // 결제 금액은 음수 처리
+          money: parsedData.amount, 
           memo: parsedData.memo,
           time: parsedData.time,
           category: parsedData.category,
