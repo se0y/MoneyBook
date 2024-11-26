@@ -129,15 +129,13 @@ export default function CalendarPage() {
 
   // handleSaveTransaction 함수 정의
   // 저장 버튼 클릭 시 데이터 추가
-  const handleSaveTransaction = async (data) => {
+  const handleSaveTransaction = async (data, date) => {
     const userId = '서연'; // (유저id 받아오면 수정할 것)
-    const date = selectedDate; // 선택된 날짜 
+    const selectedDate = date || selectedDate; // 바텀시트에서 날짜 바꿨으면 그걸로 저장, 안바꿨으면 기존에 클릭한 날짜로 저장
 
-    await addTransaction(userId, date, data); // Firestore에 데이터 추가
+    await addTransaction(userId, selectedDate, data); // Firestore에 데이터 추가
 
-    // Firestore에서 업데이트된 데이터 다시 조회
-    const updatedTransactions = await fetchTransactionsByDate(userId, date);
-    setTransactions(updatedTransactions); // 업데이트된 거래 내역으로 상태 갱신
+    onDateSelect(selectedDate); // 해당 날짜로 캘린더 클릭 & 데이터 조회
   };
 
 
