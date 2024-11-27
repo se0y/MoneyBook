@@ -67,7 +67,7 @@ const IncomeOutcomeList = ({ incomeList, outcomeList, selectedType, selectedYear
                      <Text style={styles.listItemDate}>{`${item.time} - ${new Date(item.date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}`}</Text>
                    </View>
                    <Text style={[styles.listItemAmount, isIncome ? styles.incomeAmount : styles.expenseAmount]}>
-                     {isIncome ? '+' : '-'}{item.money.toLocaleString()}
+                     {isIncome ? '+' : ''}{item.money.toLocaleString()}
                    </Text>
                  </View>
                );
