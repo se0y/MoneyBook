@@ -25,6 +25,14 @@ export default StyleSheet.create({
   },
   arrowText: {
     fontSize: 18,
+    color: '#333333', // 기본 색상
+  },
+  disabledArrow: {
+    backgroundColor: '#f0f0f0', // 버튼 배경색
+    borderRadius: 10,
+  },
+  disabledArrowText: {
+    color: '#cccccc', // 비활성화 상태의 회색 텍스트 색상
   },
   monthGrid: {
     flexDirection: 'row',
