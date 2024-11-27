@@ -62,6 +62,9 @@ const MonthlyStatics = ({ route }) => {
         return;
       }
 
+      // availableDates를 빠른 날짜 순으로 정렬
+      availableDates.sort((a, b) => new Date(a) - new Date(b));
+
       await Promise.all(
         Array.from({ length: currentMonth }, (_, i) => i + 1).map(async (month) => {
           const monthPrefix = `${currentYear}-${String(month).padStart(2, '0')}`;
@@ -129,6 +132,13 @@ const MonthlyStatics = ({ route }) => {
       );
 
       setChartData(newChartData); // 최종 차트 데이터 업데이트
+
+      // incomeList와 outcomeList를 날짜순으로 정렬
+      newIncomeList.sort((a, b) => new Date(a.date) - new Date(b.date));
+      newOutcomeList.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      setIncomeList(newIncomeList);
+      setOutcomeList(newOutcomeList);
     } catch (error) {
       console.error('Error fetching monthly data:', error);
     }

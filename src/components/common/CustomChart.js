@@ -42,7 +42,7 @@ const CustomChart = ({ chartData, space = 10 }) => {
           barWidth={12}
           barBorderRadius={4}
           spacing={space} // space prop
-          stepValue={10} // Y축 값 간격을 10k로 설정
+          stepValue={20} // Y축 값 간격을 10k로 설정
           maxValue={100} // Y축 최대값을 50k로 설정
           yAxisLabelWidth={50}
           xAxisThickness={1}
