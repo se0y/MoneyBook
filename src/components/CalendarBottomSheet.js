@@ -35,11 +35,18 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
       return; // 금액이 없으면 저장하지 않고 종료
     }
 
+    // string으로 입력된 amount를 number 타입으로 변환
+    const finalAmount = parseFloat(amount);
+    // 카테고리가 선택되지 않았을 경우 기본값 설정
+    const finalCategory = category || '기타'; // 기본값: '기타'
+    // 시간이 선택되지 않았을 경우 현재 시간으로 설정
+    const finalTime = time || new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // 기본값: 현재 시간
+
     const transactionData = {
-      money: amount,
+      money: finalAmount,
       memo: memo,
-      time: time,
-      category: category,
+      time: finalTime,
+      category: finalCategory,
       date: date,
     };
     console.log('transactionData : ', transactionData);
@@ -57,7 +64,7 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
   // 날짜 변경 함수
   const handleChangeDate = (event, selectedDate) => {
     if (selectedDate) {
-      const formattedDate = `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`;
+      const formattedDate = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
       console.log('formattedDate : ', formattedDate);
       setDate(formattedDate); // 선택된 날짜로 상태 업데이트
     }
@@ -67,7 +74,7 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
   // 시간 선택 함수
   const handleChangeTime = (event, selectedTime) => {
     if (selectedTime) {
-      const formattedTime = `${selectedTime.getHours()}:${selectedTime.getMinutes()}`;
+      const formattedTime = `${selectedTime.getHours().toString().padStart(2, '0')}:${selectedTime.getMinutes().toString().padStart(2, '0')}`;
       setTime(formattedTime); // 선택한 시간으로 상태 업데이트
     }
     setTimePickerVisible(false); // DateTimePicker 숨기기

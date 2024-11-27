@@ -99,6 +99,7 @@ export default function CalendarPage() {
         },
         { merge: true } // 문서가 없으면 생성하고, 있으면 기존 데이터에 병합
       );
+      // console.log('transaction.money:', transaction.money, '타입:', typeof transaction.money);
 
       // availableDates에 날짜 추가
       await userRef.set({
