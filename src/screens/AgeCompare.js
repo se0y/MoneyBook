@@ -128,7 +128,7 @@ const AgeCompare = ({ route }) => {
       setChartData(weekData);
 
       setMyOutcome(totalOutcome);
-      console.log(`myOutcome: ${myOutcome}`);
+      console.log(`myOutcome: ${totalOutcome}`);
 
       console.log('Fetched Weekly Data:', weekData);
     } catch (error) {
@@ -245,7 +245,7 @@ const AgeCompare = ({ route }) => {
               {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
                 -myOutcome - (peerOutcome)
               ).toLocaleString()}원 ${
-                myOutcome < -peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
+                -myOutcome > peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
               }`}
             </Text>
           </>
