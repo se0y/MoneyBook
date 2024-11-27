@@ -11,6 +11,9 @@ import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; //
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+
+ const uid = "서연";
+
   return (
     <MonthlyStaticsProvider> {/* Context Provider로 감싸기 */}
       <NavigationContainer>
@@ -22,16 +25,19 @@ const App = () => {
           {/* 월별 통계 페이지 */}
           <Stack.Screen
             name="MonthlyStatics"
-            component={MonthlyStatics}
+            component={MonthlyStatics} // 컴포넌트 참조 전달
+            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
           />
 
+
           {/* 연령대별 지출 비교 페이지 */}
           <Stack.Screen
             name="AgeCompare"
             component={AgeCompare}
+            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}

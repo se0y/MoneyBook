@@ -24,7 +24,7 @@ const BudgetIndicator = ({ budget, outcome }) => {
 
   return (
     <View style={styles.budgetContainer}>
-      <BudgetProgressBar percentage={percentage} outcome={outcome} />
+      <BudgetProgressBar percentage={percentage} budget={budget} outcome={outcome} />
       <BudgetDescription percentage={percentage} />
     </View>
   );

@@ -3,12 +3,12 @@
 
 import React from 'react';
 import { View, Text, FlatList } from 'react-native';
-import ShopCategory from '../../asset/category/ShopCategory.svg';
-import FoodCategory from '../../asset/category/FoodCategory.svg';
-import CafeCategory from '../../asset/category/CafeCategory.svg';
-import ConvenienceCategory from '../../asset/category/ConvenienceCategory.svg';
-import MoneyCategory from '../../asset/category/MoneyCategory.svg';
-import EtcCategory from '../../asset/category/EtcCategory.svg';
+import ShopCategory from '../../asset/category/monthly/ShopCategory.svg';
+import FoodCategory from '../../asset/category/monthly/FoodCategory.svg';
+import CafeCategory from '../../asset/category/monthly/CafeCategory.svg';
+import ConvenienceCategory from '../../asset/category/monthly/ConvenienceCategory.svg';
+import MoneyCategory from '../../asset/category/monthly/MoneyCategory.svg';
+import EtcCategory from '../../asset/category/monthly/EtcCategory.svg';
 import IncomeIcon from '../../asset/income/IncomeColored.svg';
 import ExpenseIcon from '../../asset/expense/ExpenseColored.svg';
 import styles from '../../styles/monthlyStatics/incomeOutcomeListStyles';
@@ -67,7 +67,7 @@ const IncomeOutcomeList = ({ incomeList, outcomeList, selectedType, selectedYear
                      <Text style={styles.listItemDate}>{`${item.time} - ${new Date(item.date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}`}</Text>
                    </View>
                    <Text style={[styles.listItemAmount, isIncome ? styles.incomeAmount : styles.expenseAmount]}>
-                     {isIncome ? '+' : '-'}{item.money.toLocaleString()}
+                     {isIncome ? '+' : ''}{item.money.toLocaleString()}
                    </Text>
                  </View>
                );

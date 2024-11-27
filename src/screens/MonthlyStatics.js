@@ -12,8 +12,8 @@ import LineIcon from '../asset/MonthlyStaticsLine.svg';
 import firestore from '@react-native-firebase/firestore'; // Firestore 연동
 import styles from '../styles/monthlyStatics/monthlyStaticsStyles';
 
-const MonthlyStatics = () => {
-  const uid = "2"; // 테스트 uid
+const MonthlyStatics = ({ route }) => {
+  const { uid } = route.params; // route.params에서 uid 가져오기
 
   const [loading, setLoading] = useState(true);
   const [income, setIncome] = useState(0); // 이번달 수입
@@ -31,9 +31,13 @@ const MonthlyStatics = () => {
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1; // 현재 월
     const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1; // 지난달
-    const previousMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear; // 지난달 연도
 
-    const newChartData = [];
+    const newChartData = Array.from({ length: 12 }, (_, i) => ({
+      label: `${i + 1}월`, // 1월부터 12월까지 생성
+      income: 0,
+      expense: 0,
+    }));
+
     const newIncomeList = [];
     const newOutcomeList = [];
 
@@ -58,11 +62,11 @@ const MonthlyStatics = () => {
         return;
       }
 
-      // 1월부터 현재 월까지 데이터를 처리
-      const months = Array.from({ length: currentMonth }, (_, i) => i + 1);
+      // availableDates를 빠른 날짜 순으로 정렬
+      availableDates.sort((a, b) => new Date(a) - new Date(b));
 
       await Promise.all(
-        months.map(async (month) => {
+        Array.from({ length: currentMonth }, (_, i) => i + 1).map(async (month) => {
           const monthPrefix = `${currentYear}-${String(month).padStart(2, '0')}`;
           const monthlyDates = availableDates.filter((date) => date.startsWith(monthPrefix));
 
@@ -73,26 +77,29 @@ const MonthlyStatics = () => {
             monthlyDates.map(async (date) => {
               const processDoc = async (docType, list, updateMonthlySum) => {
                 const doc = await userRef.collection(date).doc(docType).get();
+
                 if (doc.exists) {
                   const data = doc.data();
-                  const amount = data.money || 0;
+                  const transactions = data.transactions || {}; // transactions 필드 가져오기 (Map 형태)
 
-                  // 월별 수입/지출 총합 업데이트
-                  updateMonthlySum(amount);
+                  // transactions 맵의 각 항목을 순회하여 리스트에 추가
+                  Object.entries(transactions).forEach(([key, transaction]) => {
+                    const amount = transaction.money || 0; // 금액 추출
+                    updateMonthlySum(amount); // 월별 총합 업데이트
 
-                  // 리스트에 추가
-                  list.push({
-                    id: doc.id,
-                    memo: data.memo || '',
-                    money: amount,
-                    date: date,
-                    time: data.time || '',
-                    category: data.category || '',
+                    // 리스트에 추가
+                    list.push({
+                      id: key, // 맵의 키를 ID로 사용
+                      memo: transaction.memo || '', // 메모
+                      money: amount, // 금액
+                      date: date, // 날짜
+                      time: transaction.time || '', // 시간
+                      category: transaction.category || '', // 카테고리
+                    });
                   });
                 }
               };
 
-              // 수입/지출 데이터를 각각 리스트에 추가
               await Promise.all([
                 processDoc('income', newIncomeList, (amount) => (monthlyIncome += amount)),
                 processDoc('outcome', newOutcomeList, (amount) => (monthlyOutcome += amount)),
@@ -100,12 +107,16 @@ const MonthlyStatics = () => {
             })
           );
 
+          // 차트 데이터 업데이트
+          newChartData[month - 1].income = monthlyIncome;
+          newChartData[month - 1].outcome = -monthlyOutcome;
+
           // 현재 달이면 상태 업데이트
           if (month === currentMonth) {
             setIncome(monthlyIncome);
             setOutcome(monthlyOutcome);
-            setIncomeList([...newIncomeList]); // 현재 달 수입 리스트 업데이트
-            setOutcomeList([...newOutcomeList]); // 현재 달 지출 리스트 업데이트
+            setIncomeList([...newIncomeList]);
+            setOutcomeList([...newOutcomeList]);
             totalIncome = monthlyIncome;
             totalOutcome = monthlyOutcome;
           }
@@ -117,19 +128,17 @@ const MonthlyStatics = () => {
             lastMonthIncomeTotal = monthlyIncome;
             lastMonthOutcomeTotal = monthlyOutcome;
           }
-
-          // 차트 데이터 추가
-          newChartData.push({
-            label: `${month}월`,
-            income: monthlyIncome,
-            expense: monthlyOutcome,
-          });
         })
       );
 
-      // 상태 업데이트 (차트 데이터만 저장)
-      setChartData(newChartData);
+      setChartData(newChartData); // 최종 차트 데이터 업데이트
 
+      // incomeList와 outcomeList를 날짜순으로 정렬
+      newIncomeList.sort((a, b) => new Date(a.date) - new Date(b.date));
+      newOutcomeList.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      setIncomeList(newIncomeList);
+      setOutcomeList(newOutcomeList);
     } catch (error) {
       console.error('Error fetching monthly data:', error);
     }
@@ -165,8 +174,8 @@ const MonthlyStatics = () => {
       setLoading(false);
     };
 
-    console.log(incomeList);
-    console.log(outcomeList);
+    console.log(`수입 리스트: ${JSON.stringify(incomeList, null, 2)}`);
+    console.log(`지출 리스트: ${JSON.stringify(outcomeList, null, 2)}`);
 
     fetchData();
   }, []);
@@ -185,7 +194,7 @@ const MonthlyStatics = () => {
     },
     {
       key: 'budget',
-      component: <BudgetIndicator budget={budget} outcome={outcome} />,
+      component: <BudgetIndicator budget={budget} outcome={-outcome} />,
     },
     {
       key: 'chart',
