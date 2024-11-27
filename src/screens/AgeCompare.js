@@ -201,9 +201,9 @@ const AgeCompare = ({ route }) => {
             />
             <Text style={styles.note}>
               {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
-                -(myOutcome) - (-peerOutcome)
+                -myOutcome - (-peerOutcome)
               ).toLocaleString()}원 ${
-                -(myOutcome) > (-peerOutcome) ? '더 사용했어요' : '덜 사용했어요'
+                myOutcome > peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
               }`}
             </Text>
           </>

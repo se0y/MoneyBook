@@ -31,9 +31,13 @@ const MonthlyStatics = ({ route }) => {
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1; // 현재 월
     const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1; // 지난달
-    const previousMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear; // 지난달 연도
 
-    const newChartData = [];
+    const newChartData = Array.from({ length: 12 }, (_, i) => ({
+      label: `${i + 1}월`, // 1월부터 12월까지 생성
+      income: 0,
+      expense: 0,
+    }));
+
     const newIncomeList = [];
     const newOutcomeList = [];
 
@@ -58,11 +62,8 @@ const MonthlyStatics = ({ route }) => {
         return;
       }
 
-      // 1월부터 현재 월까지 데이터를 처리
-      const months = Array.from({ length: currentMonth }, (_, i) => i + 1);
-
       await Promise.all(
-        months.map(async (month) => {
+        Array.from({ length: currentMonth }, (_, i) => i + 1).map(async (month) => {
           const monthPrefix = `${currentYear}-${String(month).padStart(2, '0')}`;
           const monthlyDates = availableDates.filter((date) => date.startsWith(monthPrefix));
 
@@ -92,11 +93,7 @@ const MonthlyStatics = ({ route }) => {
                       time: transaction.time || '', // 시간
                       category: transaction.category || '', // 카테고리
                     });
-
-                    console.log(list);
-
                   });
-
                 }
               };
 
@@ -107,12 +104,16 @@ const MonthlyStatics = ({ route }) => {
             })
           );
 
+          // 차트 데이터 업데이트
+          newChartData[month - 1].income = monthlyIncome;
+          newChartData[month - 1].expense = -monthlyOutcome;
+
           // 현재 달이면 상태 업데이트
           if (month === currentMonth) {
             setIncome(monthlyIncome);
             setOutcome(monthlyOutcome);
-            setIncomeList([...newIncomeList]); // 현재 달 수입 리스트 업데이트
-            setOutcomeList([...newOutcomeList]); // 현재 달 지출 리스트 업데이트
+            setIncomeList([...newIncomeList]);
+            setOutcomeList([...newOutcomeList]);
             totalIncome = monthlyIncome;
             totalOutcome = monthlyOutcome;
           }
@@ -124,19 +125,10 @@ const MonthlyStatics = ({ route }) => {
             lastMonthIncomeTotal = monthlyIncome;
             lastMonthOutcomeTotal = monthlyOutcome;
           }
-
-          // 차트 데이터 추가
-          newChartData.push({
-            label: `${month}월`,
-            income: monthlyIncome,
-            expense: (-monthlyOutcome),
-          });
         })
       );
 
-      // 상태 업데이트 (차트 데이터만 저장)
-      setChartData(newChartData);
-
+      setChartData(newChartData); // 최종 차트 데이터 업데이트
     } catch (error) {
       console.error('Error fetching monthly data:', error);
     }
