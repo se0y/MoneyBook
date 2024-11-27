@@ -11,8 +11,8 @@ import styles from '../styles/ageCompare/ageCompareStyles';
 import Header from '../components/common/Header';
 import firestore from '@react-native-firebase/firestore';
 
-const AgeCompare = () => {
-  const uid = "2"; // 테스트 uid
+const AgeCompare = ({ route }) => {
+  const { uid } = route.params; // route.params에서 uid 가져오기
 
   const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜 초기값 null
   const [year, setYear] = useState(0);
@@ -76,7 +76,7 @@ const AgeCompare = () => {
           return {
             label: `${weekDocNumbers[index]}주`, // 주차 번호 사용
             income,
-            expense: outcome,
+            expense: -outcome,
           };
         }
         return {
@@ -193,17 +193,17 @@ const AgeCompare = () => {
               <WeeklyChart chartData={chartData} space={20} />
             </View>
             <AmountDetail
-              income={myOutcome}
-              outcome={peerOutcome}
+              income={-myOutcome}
+              outcome={-peerOutcome}
               isAgeCompare={true} // AgeCompare 페이지에서 사용
               incomeLabel="내 지출"
               outcomeLabel="또래 지출"
             />
             <Text style={styles.note}>
               {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
-                myOutcome - peerOutcome
+                -(myOutcome) - (-peerOutcome)
               ).toLocaleString()}원 ${
-                myOutcome > peerOutcome ? '더 사용했어요' : '덜 사용했어요'
+                -(myOutcome) > (-peerOutcome) ? '더 사용했어요' : '덜 사용했어요'
               }`}
             </Text>
           </>

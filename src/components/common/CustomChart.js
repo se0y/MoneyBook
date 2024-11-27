@@ -36,25 +36,28 @@ const CustomChart = ({ chartData, space = 10 }) => {
   return (
     <View style={styles.chartContainer}>
       <Text style={styles.chartTitle}>수입과 지출</Text>
-      <BarChart
-        data={barData}
-        barWidth={12}
-        barBorderRadius={4}
-        spacing={space} // space prop
-        stepValue={5}
-        maxValue={15}
-        yAxisLabelWidth={50}
-        xAxisThickness={1}
-        yAxisThickness={1}
-        height={220}
-        width={272}
-        hideRules={false}
-        rulesColor="#D3D3D3"
-        yAxisLabelSuffix="k"
-        yAxisTextStyle={{ color: '#333', fontSize: 12 }}
-      />
+      <View style={styles.chartWrapper}>
+        <BarChart
+          data={barData}
+          barWidth={12}
+          barBorderRadius={4}
+          spacing={space} // space prop
+          stepValue={10} // Y축 값 간격을 10k로 설정
+          maxValue={100} // Y축 최대값을 50k로 설정
+          yAxisLabelWidth={50}
+          xAxisThickness={1}
+          yAxisThickness={1}
+          height={220}
+          width={272}
+          hideRules={false}
+          rulesColor="#D3D3D3"
+          yAxisLabelSuffix="k"
+          yAxisTextStyle={{ color: '#333', fontSize: 12 }}
+        />
+      </View>
     </View>
   );
 };
 
 export default CustomChart;
+
