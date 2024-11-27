@@ -126,7 +126,9 @@ const AgeCompare = ({ route }) => {
 
       // 주차별 데이터 상태 업데이트
       setChartData(weekData);
+
       setMyOutcome(totalOutcome);
+      console.log(`myOutcome: ${myOutcome}`);
 
       console.log('Fetched Weekly Data:', weekData);
     } catch (error) {
@@ -186,10 +188,6 @@ const AgeCompare = ({ route }) => {
         console.log(`Calling fetchWeeklyData with Year: ${year}, Month: ${month}`);
         await fetchWeeklyData(uid, year, month); // year와 month 전달
 
-        const totalOutcome = chartData.reduce((total, week) => total + (-week.outcome), 0); // 내 지출 설정
-        setMyOutcome(totalOutcome);
-        console.log(`myOutcome: ${myOutcome}`);
-
         const peerOutcome = await fetchPeerOutcome(age);
         setPeerOutcome(peerOutcome);
 
@@ -247,7 +245,7 @@ const AgeCompare = ({ route }) => {
               {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
                 -myOutcome - (peerOutcome)
               ).toLocaleString()}원 ${
-                -myOutcome > peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
+                myOutcome < -peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
               }`}
             </Text>
           </>
