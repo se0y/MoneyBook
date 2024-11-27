@@ -109,7 +109,7 @@ const MonthlyStatics = ({ route }) => {
 
           // 차트 데이터 업데이트
           newChartData[month - 1].income = monthlyIncome;
-          newChartData[month - 1].expense = -monthlyOutcome;
+          newChartData[month - 1].outcome = -monthlyOutcome;
 
           // 현재 달이면 상태 업데이트
           if (month === currentMonth) {

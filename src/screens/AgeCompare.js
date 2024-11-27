@@ -14,6 +14,7 @@ import firestore from '@react-native-firebase/firestore';
 const AgeCompare = ({ route }) => {
   const { uid } = route.params; // route.params에서 uid 가져오기
 
+  const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜 초기값 null
   const [year, setYear] = useState(0);
   const [month, setMonth] = useState(0);
@@ -47,117 +48,157 @@ const AgeCompare = ({ route }) => {
     setCalendarVisible(false); // 캘린더 닫기
   };
 
-  // 사용자가 설정한 연도, 월의 주차별 수입, 지출 차트 데이터 조회
-  const fetchChartData = async (uid) => {
+  // 주차별 데이터 조회
+  const fetchWeeklyData = async (uid, year, month) => {
     try {
-      // Firestore 참조
-      const weeksRef = firestore()
-        .collection('WeekAmount')
-        .doc(uid)
-        .collection('Year')
-        .doc(year.toString())
-        .collection('Month')
-        .doc(month.toString())
-        .collection('Weeks');
+      const userRef = firestore().collection('Users').doc(uid);
 
-      // Firestore에서 문서 ID를 기준으로 주차 데이터 가져오기
-      const weekDocNumbers = ['1', '2', '3', '4']; // 주차 번호를 문자열로 명시
-      const weekPromises = weekDocNumbers.map((weekNumber) => weeksRef.doc(weekNumber).get());
+      const monthPrefix = `${year}-${String(month).padStart(2, '0')}`;
+      const availableDatesSnapshot = await userRef.get();
 
-      const weekSnapshots = await Promise.all(weekPromises);
+      if (!availableDatesSnapshot.exists) {
+        console.error("User data not found.");
+        return [];
+      }
 
-      // 주차별 데이터를 매핑하면서 총 지출 (totalOutcome) 계산
-      let totalOutcome = 0;
+      const { availableDates } = availableDatesSnapshot.data();
+      if (!availableDates || !Array.isArray(availableDates) || availableDates.length === 0) {
+        console.warn('No available dates found in Firestore.');
+        return [];
+      }
 
-      const weekData = weekSnapshots.map((snapshot, index) => {
-        if (snapshot.exists) {
-          const { income = 0, outcome = 0 } = snapshot.data();
-          totalOutcome += outcome; // 총 지출 계산
-          return {
-            label: `${weekDocNumbers[index]}주`, // 주차 번호 사용
-            income,
-            expense: -outcome,
-          };
-        }
-        return {
-          label: `${weekDocNumbers[index]}주`,
-          income: 0,
-          expense: 0,
-        };
+      console.log(`Available Dates: ${JSON.stringify(availableDates)}`); // 데이터 형식 확인
+      console.log(`Month Prefix: ${monthPrefix}`);
+
+      // 선택된 연도와 월에 해당하는 날짜 필터링
+      const monthlyDates = availableDates.filter((date) => date.startsWith(monthPrefix));
+      monthlyDates.sort((a, b) => new Date(a) - new Date(b)); // 날짜 정렬
+      console.log(`Filtered Monthly Dates: ${monthlyDates}`);
+
+      if (monthlyDates.length === 0) {
+        console.warn('No data for the selected month.');
+        return [];
+      }
+
+      // 주차별로 나누기 (4주로 나눔)
+      const weeks = [[], [], [], []];
+      monthlyDates.forEach((date) => {
+        const weekIndex = Math.ceil(new Date(date).getDate() / 7) - 1; // 날짜를 7일 기준으로 주차 계산
+        weeks[Math.min(weekIndex, 3)].push(date); // 4주 이내로 제한
       });
 
-      // 차트 데이터 상태 업데이트
+      let totalIncome = 0;
+      let totalOutcome = 0;
+      const weekData = [];
+
+      for (let i = 0; i < weeks.length; i++) {
+        let weeklyIncome = 0;
+        let weeklyOutcome = 0;
+
+        for (const date of weeks[i]) {
+          const incomeDoc = await userRef.collection(date).doc('income').get();
+          const outcomeDoc = await userRef.collection(date).doc('outcome').get();
+
+          if (incomeDoc.exists) {
+            const { transactions = {} } = incomeDoc.data();
+            Object.values(transactions).forEach((transaction) => {
+              weeklyIncome += transaction.money || 0;
+            });
+          }
+
+          if (outcomeDoc.exists) {
+            const { transactions = {} } = outcomeDoc.data();
+            Object.values(transactions).forEach((transaction) => {
+              weeklyOutcome += transaction.money || 0;
+            });
+          }
+        }
+
+        weekData.push({
+          label: `${i + 1}주`,
+          income: weeklyIncome,
+          outcome: -weeklyOutcome,
+        });
+
+        totalIncome += weeklyIncome;
+        totalOutcome += weeklyOutcome;
+      }
+
+      // 주차별 데이터 상태 업데이트
       setChartData(weekData);
       setMyOutcome(totalOutcome);
 
-      console.log('Fetched Chart Data:', weekData);
-
-      return weekData; // 최종 데이터 반환
+      console.log('Fetched Weekly Data:', weekData);
     } catch (error) {
-      console.error('Error fetching weekly chart data:', error);
-      return [];
-    }
-  };
-
-  // 또래 지출 조회
-  const fetchPeerOutcome = async (age) => {
-    try {
-      // age를 기준으로 또래 나이 그룹 계산
-      const peerAge = age < 10 ? 0 : parseInt(age.toString()[0] + '0', 10);
-
-      console.log('Peer Age Group:', peerAge);
-
-      // Firestore 참조
-      const peerOutcomeRef = firestore()
-        .collection('PeerOutcome')
-        .doc(peerAge.toString()) // 나이 그룹
-        .collection('peer')
-        .doc('outcome');
-
-      // Firestore 데이터 가져오기
-      const peerDoc = await peerOutcomeRef.get();
-
-      if (peerDoc.exists) {
-        const { outcome } = peerDoc.data();
-        console.log('Fetched Peer Outcome:', outcome);
-        return outcome; // 데이터 반환
-      } else {
-        console.log('No data found for peer outcome.');
-        return 0; // 데이터가 없으면 0 반환
-      }
-    } catch (error) {
-      console.error('Error fetching peer outcome:', error);
-      return 0; // 오류 발생 시 기본값 0 반환
-    }
-  };
-
-  // 확인 버튼 클릭 시
-  const handleConfirmClick = async () => {
-    if (!selectedDate) {
-      Alert.alert('입력 오류', '연도와 월을 선택하세요.');
-      return;
-    }
-
-    if (!validateAge(age)) {
-      Alert.alert('입력 오류', '나이를 올바르게 입력하세요.');
-      return;
-    }
-
-    try {
-      const chartData = await fetchChartData(uid);
-      setChartData(chartData); // 주차별 차트 데이터 설정
-
-      const totalOutcome = chartData.reduce((total, week) => total + week.expense, 0); // 내 지출 설정
-      setMyOutcome(totalOutcome);
-
-      const peerOutcome = await fetchPeerOutcome(age);
-      setPeerOutcome(peerOutcome);
-
-      setIsConfirmed(true); // 데이터 확인 상태로 변경
-    } catch (error) {
+      console.error('Error fetching weekly data:', error);
       Alert.alert('오류 발생', '데이터를 불러오는 중 문제가 발생했습니다.');
     }
   };
+
+
+  // 또래 지출 조회
+    const fetchPeerOutcome = async (age) => {
+      try {
+        // age를 기준으로 또래 나이 그룹 계산
+        const peerAge = age < 10 ? 0 : parseInt(age.toString()[0] + '0', 10);
+
+        console.log('Peer Age Group:', peerAge);
+
+        // Firestore 참조
+        const peerOutcomeRef = firestore()
+          .collection('PeerOutcome')
+          .doc(peerAge.toString()) // 나이 그룹
+          .collection('peer')
+          .doc('outcome');
+
+        // Firestore 데이터 가져오기
+        const peerDoc = await peerOutcomeRef.get();
+
+        if (peerDoc.exists) {
+          const { outcome } = peerDoc.data();
+          console.log('Fetched Peer Outcome:', outcome);
+          return outcome; // 데이터 반환
+        } else {
+          console.log('No data found for peer outcome.');
+          return 0; // 데이터가 없으면 0 반환
+        }
+      } catch (error) {
+        console.error('Error fetching peer outcome:', error);
+        return 0; // 오류 발생 시 기본값 0 반환
+      }
+    };
+
+    // 확인 버튼 클릭 시
+    const handleConfirmClick = async () => {
+      if (!selectedDate) {
+        Alert.alert('입력 오류', '연도와 월을 선택하세요.');
+        return;
+      }
+
+      if (!validateAge(age)) {
+        Alert.alert('입력 오류', '나이를 올바르게 입력하세요.');
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        console.log(`Calling fetchWeeklyData with Year: ${year}, Month: ${month}`);
+        await fetchWeeklyData(uid, year, month); // year와 month 전달
+
+        const totalOutcome = chartData.reduce((total, week) => total + (-week.outcome), 0); // 내 지출 설정
+        setMyOutcome(totalOutcome);
+        console.log(`myOutcome: ${myOutcome}`);
+
+        const peerOutcome = await fetchPeerOutcome(age);
+        setPeerOutcome(peerOutcome);
+
+        setIsConfirmed(true); // 데이터 확인 상태로 변경
+        setLoading(false);
+      } catch (error) {
+        Alert.alert('오류 발생', '데이터를 불러오는 중 문제가 발생했습니다.');
+      }
+    };
 
   return (
     <View style={styles.container}>
@@ -173,6 +214,7 @@ const AgeCompare = ({ route }) => {
           onIconPress={() => setCalendarVisible(true)} // 아이콘 클릭 시 캘린더 열기
           isDate
         />
+
         <InputField
           label="내 나이"
           value={age}
@@ -180,20 +222,22 @@ const AgeCompare = ({ route }) => {
             if (text === '' || (!isNaN(text) && text.trim() !== '')) setAge(text); // 숫자만 입력 가능
           }}
         />
+
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleConfirmClick}>
             <Text style={styles.buttonText}>확인</Text>
           </TouchableOpacity>
         </View>
 
+
         {/* 차트 및 요약 데이터 표시 */}
         {isConfirmed && chartData.length > 0 && (
           <>
             <View style={styles.chartWrapper}>
-              <WeeklyChart chartData={chartData} space={20} />
+              <WeeklyChart chartData={chartData} space={18} />
             </View>
             <AmountDetail
-              income={-myOutcome}
+              income={myOutcome}
               outcome={-peerOutcome}
               isAgeCompare={true} // AgeCompare 페이지에서 사용
               incomeLabel="내 지출"
@@ -201,9 +245,9 @@ const AgeCompare = ({ route }) => {
             />
             <Text style={styles.note}>
               {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
-                -myOutcome - (-peerOutcome)
+                -myOutcome - (peerOutcome)
               ).toLocaleString()}원 ${
-                myOutcome > peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
+                myOutcome < -peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
               }`}
             </Text>
           </>

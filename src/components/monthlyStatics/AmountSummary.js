@@ -29,7 +29,7 @@ const AmountSummary = ({ label, isBudget, budget, outcome }) => {
         ]}
       >
         {isBudget
-          ? `${(budget-outcome).toLocaleString()} 원`
+          ? `${(budget+outcome).toLocaleString()} 원`
           : `${outcome.toLocaleString()} 원`}
       </Text>
     </View>

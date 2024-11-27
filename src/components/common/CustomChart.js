@@ -26,7 +26,7 @@ const CustomChart = ({ chartData, space = 10 }) => {
         ),
       },
       {
-        value: item.expense / 1000,
+        value: item.outcome / 1000,
         label: '',
         frontColor: '#E97072', // 지출 색상
       },
