@@ -1,3 +1,7 @@
+plugins {
+   id 'com.google.gms.google-services' version '4.3.15' apply false // firebase google-service
+}
+
 buildscript {
     ext {
         buildToolsVersion = "35.0.0"
@@ -26,8 +30,6 @@ allprojects {
     }
 }
 
-//plugins {
-//    id 'com.google.gms.google-services' version '4.3.15' apply false // firebase google-service
-//}
+
 //
-//apply plugin: "com.facebook.react.rootproject"
+apply plugin: 'com.google.gms.google-services'
