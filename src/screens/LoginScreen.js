@@ -77,7 +77,6 @@ function LoginScreen({ navigation }) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.customView} />
-//
 
           <Text style={styles.title}>환영합니다</Text>
           {/* 이메일 입력 */}

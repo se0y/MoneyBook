@@ -54,19 +54,6 @@ const App = () => {
     requestPermission();
   }, []);
 
-//  const firebaseConfig = {
-//    apiKey: "AIzaSyDj4c4GHg7h4sFtXI5Q5T_SdWqZOutLSlc",
-//    authDomain: "moneybook-a23ea.firebaseapp.com",
-//    projectId: "moneybook-a23ea",
-//    storageBucket: "moneybook-a23ea.appspot.com",
-//    messagingSenderId: "367316691513",
-//    appId: "1:367316691513:android:0a50558a38a0b7a9803be8"
-//};
-//
-//  const app = initializeApp(firebaseConfig);
-//
-//  const db = getFirestore(app);
-
   return (
     <UserProvider>
       <NavigationContainer>
@@ -84,7 +71,6 @@ const App = () => {
           <Stack.Screen
             name="Calendar"
             component={CalendarPage} // 컴포넌트 참조 전달
-//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
@@ -94,7 +80,6 @@ const App = () => {
           <Stack.Screen
             name="MonthlyStatics"
             component={MonthlyStatics} // 컴포넌트 참조 전달
-//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
@@ -104,22 +89,20 @@ const App = () => {
           <Stack.Screen
             name="AgeCompare"
             component={AgeCompare}
-//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
           />
 
-                    {/* 알림 페이지 */}
-                    <Stack.Screen
-                      name="NotificationScreen"
-                      component={NotificationScreen}
-                      options={{
-                                    presentation: 'transparentModal', // 모달로 설정
-
-                        animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
-                      }}
-                    />
+           {/* 알림 페이지 */}
+           <Stack.Screen
+              name="NotificationScreen"
+              component={NotificationScreen}
+              options={{
+               presentation: 'transparentModal', // 모달로 설정
+               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+               }}
+           />
 
           {/* 메뉴 페이지 */}
           <Stack.Screen
