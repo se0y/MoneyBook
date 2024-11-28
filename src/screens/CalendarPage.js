@@ -236,15 +236,12 @@ export default function CalendarPage() {
 
   return (
     <View style={styles.container}>
-          <Header title="캘린더" />
+      <Header title="Calendar" backgroundColor='#FFF7EA' isCalendar={true} />
 
       {/* 맨 위 여백 => 추후 햄버거 바&알림버튼으로 변경 */}
-      <View style={{ marginTop: 30 }} />
+      <View style={{ marginTop: 0 }} />
 
       {/* 제목 */}
-      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#093030', textAlign: 'center' }}>
-        Calendar
-      </Text>
 
       {/* 여백 */}
       <View style={{ marginVertical: 5 }} />

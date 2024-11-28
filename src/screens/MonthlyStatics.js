@@ -230,7 +230,7 @@ const MonthlyStatics = ({ route }) => {
         renderItem={({ item }) => item.component}
         contentContainerStyle={styles.container}
         ListHeaderComponent={
-          <Header title="나의 월별 통계" />
+          <Header title="나의 월별 통계" backgroundColor='#FFD38B' marginRight={30} />
         }
       />
     </View>
