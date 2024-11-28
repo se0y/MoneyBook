@@ -11,8 +11,12 @@ import styles from '../styles/ageCompare/ageCompareStyles';
 import Header from '../components/common/Header';
 import firestore from '@react-native-firebase/firestore';
 
-const AgeCompare = ({ route }) => {
-  const { uid } = route.params; // route.params에서 uid 가져오기
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext'; // UserContext 가져오기
+
+
+const AgeCompare = () => {
+  const { userId } = useContext(UserContext); // userId 가져오기
 
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜 초기값 null
@@ -49,9 +53,9 @@ const AgeCompare = ({ route }) => {
   };
 
   // 주차별 데이터 조회
-  const fetchWeeklyData = async (uid, year, month) => {
+  const fetchWeeklyData = async (userId, year, month) => {
     try {
-      const userRef = firestore().collection('Users').doc(uid);
+      const userRef = firestore().collection('Users').doc(userId);
 
       const monthPrefix = `${year}-${String(month).padStart(2, '0')}`;
       const availableDatesSnapshot = await userRef.get();
@@ -186,7 +190,7 @@ const AgeCompare = ({ route }) => {
         setLoading(true);
 
         console.log(`Calling fetchWeeklyData with Year: ${year}, Month: ${month}`);
-        await fetchWeeklyData(uid, year, month); // year와 month 전달
+        await fetchWeeklyData(userId, year, month); // year와 month 전달
 
         const peerOutcome = await fetchPeerOutcome(age);
         setPeerOutcome(peerOutcome);

@@ -1,25 +1,28 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import HomeScreen from './src/screens/HomeScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import SignUpScreen from './src/screens/SignUpScreen';
+import SuccessScreen from './src/screens/SuccessScreen';
 import MonthlyStatics from './src/screens/MonthlyStatics';
 import AgeCompare from './src/screens/AgeCompare';
 import MenuBar from './src/screens/MenuBar';
+import NotificationScreen from './src/screens/NotificationScreen'
 import { PermissionsAndroid, Alert } from 'react-native';
 import CalendarPage from './src/screens/CalendarPage';
 import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // 가정된 context 파일
 import { request, PERMISSIONS } from 'react-native-permissions';
+import firestore from '@react-native-firebase/firestore';
+import { UserProvider } from './src/context/UserContext'; // UserProvider 가져오기
+
+//import firebase from '@react-native-firebase/app';
+//import { initializeApp } from 'firebase/app';
+//import { getFirestore } from '@react-native-firebase/firestore';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const uid = "서연";
 
   const [permissionGranted, setPermissionGranted] = useState(false);
 
@@ -51,14 +54,32 @@ const App = () => {
     requestPermission();
   }, []);
 
+//  const firebaseConfig = {
+//    apiKey: "AIzaSyDj4c4GHg7h4sFtXI5Q5T_SdWqZOutLSlc",
+//    authDomain: "moneybook-a23ea.firebaseapp.com",
+//    projectId: "moneybook-a23ea",
+//    storageBucket: "moneybook-a23ea.appspot.com",
+//    messagingSenderId: "367316691513",
+//    appId: "1:367316691513:android:0a50558a38a0b7a9803be8"
+//};
+//
+//  const app = initializeApp(firebaseConfig);
+//
+//  const db = getFirestore(app);
+
   return (
-    <MonthlyStaticsProvider> {/* Context Provider로 감싸기 */}
+    <UserProvider>
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false, // 기본적으로 헤더를 숨김
-          }}
-        >
+      <Stack.Navigator initialRouteName="Home" screenOptions = {{headerShown : false}}>
+
+          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+          
+          <Stack.Screen name="Login" component={LoginScreen} options={{ title: '로그인' }} />
+          
+          <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: '회원가입'}}/>
+          
+          <Stack.Screen name="Success" component={SuccessScreen} options={{title: '로그인 성공'}}/>
+          
           {/* 캘린더 페이지 */}
           <Stack.Screen
             name="Calendar"
@@ -73,7 +94,7 @@ const App = () => {
           <Stack.Screen
             name="MonthlyStatics"
             component={MonthlyStatics} // 컴포넌트 참조 전달
-            initialParams={{ uid }} // uid를 초기 파라미터로 전달
+//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
@@ -83,11 +104,22 @@ const App = () => {
           <Stack.Screen
             name="AgeCompare"
             component={AgeCompare}
-            initialParams={{ uid }} // uid를 초기 파라미터로 전달
+//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
           />
+
+                    {/* 알림 페이지 */}
+                    <Stack.Screen
+                      name="NotificationScreen"
+                      component={NotificationScreen}
+                      options={{
+                                    presentation: 'transparentModal', // 모달로 설정
+
+                        animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+                      }}
+                    />
 
           {/* 메뉴 페이지 */}
           <Stack.Screen
@@ -101,7 +133,7 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </MonthlyStaticsProvider>
+    </UserProvider>
   );
 };
 
