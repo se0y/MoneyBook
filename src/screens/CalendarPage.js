@@ -8,6 +8,8 @@ import TransactionList from '../components/TransactionList';
 import FloatingButton from '../components/FloatingButton';
 import CalendarModal from '../components/CalendarBottomSheet';
 
+import Header from '../components/common/Header';
+
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -234,6 +236,8 @@ export default function CalendarPage() {
 
   return (
     <View style={styles.container}>
+          <Header title="캘린더" />
+
       {/* 맨 위 여백 => 추후 햄버거 바&알림버튼으로 변경 */}
       <View style={{ marginTop: 30 }} />
 

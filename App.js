@@ -1,12 +1,26 @@
-// App.js
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
 
 import React, { useState, useEffect } from 'react';
-import { PermissionsAndroid, View, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import MonthlyStatics from './src/screens/MonthlyStatics';
+import AgeCompare from './src/screens/AgeCompare';
+import MenuBar from './src/screens/MenuBar';
+import { PermissionsAndroid, Alert } from 'react-native';
 import CalendarPage from './src/screens/CalendarPage';
-import SmsListener from 'react-native-android-sms-listener';
+import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // 가정된 context 파일
 import { request, PERMISSIONS } from 'react-native-permissions';
 
+const Stack = createNativeStackNavigator();
+
 const App = () => {
+  const uid = "서연";
+
   const [permissionGranted, setPermissionGranted] = useState(false);
 
   const requestPermission = async () => {
@@ -14,16 +28,16 @@ const App = () => {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.RECEIVE_SMS, // SMS 수신 권한 요청
         {
-          title: "SMS Permission",  // 권한 요청 다이얼로그 제목
-          message: "This app needs access to your SMS messages to parse them.",  // 권한 설명
-          buttonNeutral: "Ask Me Later",  // 나중에 물어보기 버튼
-          buttonNegative: "Cancel",  // 취소 버튼
-          buttonPositive: "OK",  // 승인 버튼
+          title: "SMS Permission", // 권한 요청 다이얼로그 제목
+          message: "This app needs access to your SMS messages to parse them.", // 권한 설명
+          buttonNeutral: "Ask Me Later", // 나중에 물어보기 버튼
+          buttonNegative: "Cancel", // 취소 버튼
+          buttonPositive: "OK", // 승인 버튼
         }
       );
 
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        setPermissionGranted(true);  // 권한 승인 시 상태 업데이트
+        setPermissionGranted(true); // 권한 승인 시 상태 업데이트
       } else {
         Alert.alert("Permission Denied", "SMS permission is required to test.");
       }
@@ -38,11 +52,61 @@ const App = () => {
   }, []);
 
   return (
-      <CalendarPage />
+    <MonthlyStaticsProvider> {/* Context Provider로 감싸기 */}
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false, // 기본적으로 헤더를 숨김
+          }}
+        >
+          {/* 캘린더 페이지 */}
+          <Stack.Screen
+            name="Calendar"
+            component={CalendarPage} // 컴포넌트 참조 전달
+//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
+            options={{
+              animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+            }}
+          />
+
+          {/* 월별 통계 페이지 */}
+          <Stack.Screen
+            name="MonthlyStatics"
+            component={MonthlyStatics} // 컴포넌트 참조 전달
+            initialParams={{ uid }} // uid를 초기 파라미터로 전달
+            options={{
+              animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+            }}
+          />
+
+          {/* 연령대별 지출 비교 페이지 */}
+          <Stack.Screen
+            name="AgeCompare"
+            component={AgeCompare}
+            initialParams={{ uid }} // uid를 초기 파라미터로 전달
+            options={{
+              animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+            }}
+          />
+
+          {/* 메뉴 페이지 */}
+          <Stack.Screen
+            name="Menu"
+            component={MenuBar}
+            options={{
+              presentation: 'transparentModal', // 모달로 설정
+              animation: 'slide_from_left', // 왼쪽에서 오른쪽으로 슬라이드
+            }}
+            initialParams={{ userName: '홍길동', percent: 25 }} // 기본 매개변수 전달
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </MonthlyStaticsProvider>
   );
 };
 
 export default App;
+
 
 //문자 읽어오는 테스트 코드
 // import React, { useEffect } from "react";
