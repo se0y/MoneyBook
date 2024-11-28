@@ -35,7 +35,7 @@ const Header = ({ title, backgroundColor, isCalendar, marginRight }) => {
           style={styles.menuIconContainer} // 아이콘 크기를 제한하는 스타일
           onPress={() => {
             console.log('알람 아이콘 클릭됨');
-            navigation.navigate('Alarm'); // 알람 페이지로 이동
+            navigation.navigate('NotificationScreen'); // 알람 페이지로 이동
           }}
         >
           <AlarmIcon /> {/* 알람 아이콘 */}

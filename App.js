@@ -11,6 +11,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MonthlyStatics from './src/screens/MonthlyStatics';
 import AgeCompare from './src/screens/AgeCompare';
 import MenuBar from './src/screens/MenuBar';
+import NotificationScreen from './src/screens/NotificationScreen'
 import { PermissionsAndroid, Alert } from 'react-native';
 import CalendarPage from './src/screens/CalendarPage';
 import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // 가정된 context 파일
@@ -88,6 +89,17 @@ const App = () => {
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
           />
+
+                    {/* 알림 페이지 */}
+                    <Stack.Screen
+                      name="NotificationScreen"
+                      component={NotificationScreen}
+                      options={{
+                                    presentation: 'transparentModal', // 모달로 설정
+
+                        animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+                      }}
+                    />
 
           {/* 메뉴 페이지 */}
           <Stack.Screen
