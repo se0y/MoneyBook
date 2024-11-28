@@ -19,7 +19,7 @@ export default StyleSheet.create({
   headerTitle: {
     justifyContent: 'center', // 아이콘 수직 중앙 정렬
     alignItems: 'center', // 아이콘 수평 중앙 정렬
-    marginRight: 37,
+//    marginRight: 25,
     flex: 1, // 제목을 중앙에 위치하도록 설정
     fontSize: 18, // 텍스트 크기
     fontWeight: 'bold', // 굵은 글씨

@@ -12,8 +12,12 @@ import LineIcon from '../asset/MonthlyStaticsLine.svg';
 import firestore from '@react-native-firebase/firestore'; // Firestore 연동
 import styles from '../styles/monthlyStatics/monthlyStaticsStyles';
 
-const MonthlyStatics = ({ route }) => {
-  const { uid } = route.params; // route.params에서 uid 가져오기
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext'; // UserContext 가져오기
+
+
+const MonthlyStatics = () => {
+  const { userId } = useContext(UserContext); // uid 가져오기
 
   const [loading, setLoading] = useState(true);
   const [income, setIncome] = useState(0); // 이번달 수입
@@ -47,7 +51,7 @@ const MonthlyStatics = ({ route }) => {
     let lastMonthOutcomeTotal = 0; // 지난달 총 지출
 
     try {
-      const userRef = firestore().collection('Users').doc(uid);
+      const userRef = firestore().collection('Users').doc(userId);
 
       // Firebase에서 availableDates 필드 가져오기
       const userSnapshot = await userRef.get();
@@ -152,7 +156,7 @@ const MonthlyStatics = ({ route }) => {
     const targetPrefix = `${currentYear}-${currentMonth}`;
 
     try {
-      const userRef = firestore().collection('Users').doc(uid);
+      const userRef = firestore().collection('Users').doc(userId);
       const budgetDoc = await userRef.collection('budget').doc(targetPrefix).get();
       if (budgetDoc.exists) {
         const fetchedBudget = budgetDoc.data().targetBudget;
@@ -230,7 +234,7 @@ const MonthlyStatics = ({ route }) => {
         renderItem={({ item }) => item.component}
         contentContainerStyle={styles.container}
         ListHeaderComponent={
-          <Header title="나의 월별 통계" />
+          <Header title="나의 월별 통계" backgroundColor='#FFD38B' marginRight={30} />
         }
       />
     </View>

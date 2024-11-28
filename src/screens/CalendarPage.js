@@ -9,8 +9,12 @@ import FloatingButton from '../components/FloatingButton';
 import CalendarModal from '../components/CalendarBottomSheet';
 
 import Header from '../components/common/Header';
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext'; // UserContext 가져오기
 
 export default function CalendarPage() {
+  const { userId } = useContext(UserContext); // uid 가져오기
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);  
@@ -51,9 +55,8 @@ export default function CalendarPage() {
   }, []);
 
 
-
   // Firestore에서 데이터 조회
-  const fetchTransactionsByDate = async (userId="서연", date) => {
+  const fetchTransactionsByDate = async (userId, date) => {
     try {
       const userRef = firestore().collection('Users').doc(userId);
       const dateRef = userRef.collection(date); // 선택된 날짜의 서브컬렉션 참조
@@ -122,7 +125,7 @@ export default function CalendarPage() {
   const onDateSelect = async (day) => {
     setSelectedDate(day); // 선택된 날짜 설정
   
-    const userId = '서연'; // (유저id 받아오면 수정할 것)
+//    const userId = '서연'; // (유저id 받아오면 수정할 것)
     const transactions = await fetchTransactionsByDate(userId, day); // Firestore에서 데이터 조회
   
     setTransactions(transactions); // 조회된 거래 내역을 상태로 설정
@@ -140,7 +143,7 @@ export default function CalendarPage() {
   // handleSaveTransaction 함수 정의
   // 저장 버튼 클릭 시 데이터 추가
   const handleSaveTransaction = async (data, date) => {
-    const userId = '서연'; // (유저id 받아오면 수정할 것)
+//    const userId = '서연'; // (유저id 받아오면 수정할 것)
     const selectedDate = date || selectedDate; // 바텀시트에서 날짜 바꿨으면 그걸로 저장, 안바꿨으면 기존에 클릭한 날짜로 저장
 
     await addTransaction(userId, selectedDate, data); // Firestore에 데이터 추가
@@ -236,15 +239,12 @@ export default function CalendarPage() {
 
   return (
     <View style={styles.container}>
-          <Header title="캘린더" />
+      <Header title="Calendar" backgroundColor='#FFF7EA' isCalendar={true} />
 
       {/* 맨 위 여백 => 추후 햄버거 바&알림버튼으로 변경 */}
-      <View style={{ marginTop: 30 }} />
+      <View style={{ marginTop: 0 }} />
 
       {/* 제목 */}
-      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#093030', textAlign: 'center' }}>
-        Calendar
-      </Text>
 
       {/* 여백 */}
       <View style={{ marginVertical: 5 }} />

@@ -1,25 +1,28 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import HomeScreen from './src/screens/HomeScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import SignUpScreen from './src/screens/SignUpScreen';
+import SuccessScreen from './src/screens/SuccessScreen';
 import MonthlyStatics from './src/screens/MonthlyStatics';
 import AgeCompare from './src/screens/AgeCompare';
 import MenuBar from './src/screens/MenuBar';
+import NotificationScreen from './src/screens/NotificationScreen'
 import { PermissionsAndroid, Alert } from 'react-native';
 import CalendarPage from './src/screens/CalendarPage';
 import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // 가정된 context 파일
 import { request, PERMISSIONS } from 'react-native-permissions';
+import firestore from '@react-native-firebase/firestore';
+import { UserProvider } from './src/context/UserContext'; // UserProvider 가져오기
+
+//import firebase from '@react-native-firebase/app';
+//import { initializeApp } from 'firebase/app';
+//import { getFirestore } from '@react-native-firebase/firestore';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const uid = "서연";
 
   const [permissionGranted, setPermissionGranted] = useState(false);
 
@@ -52,18 +55,22 @@ const App = () => {
   }, []);
 
   return (
-    <MonthlyStaticsProvider> {/* Context Provider로 감싸기 */}
+    <UserProvider>
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false, // 기본적으로 헤더를 숨김
-          }}
-        >
+      <Stack.Navigator initialRouteName="Home" screenOptions = {{headerShown : false}}>
+
+          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+          
+          <Stack.Screen name="Login" component={LoginScreen} options={{ title: '로그인' }} />
+          
+          <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: '회원가입'}}/>
+          
+          <Stack.Screen name="Success" component={SuccessScreen} options={{title: '로그인 성공'}}/>
+          
           {/* 캘린더 페이지 */}
           <Stack.Screen
             name="Calendar"
             component={CalendarPage} // 컴포넌트 참조 전달
-//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
@@ -73,7 +80,6 @@ const App = () => {
           <Stack.Screen
             name="MonthlyStatics"
             component={MonthlyStatics} // 컴포넌트 참조 전달
-            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
@@ -83,11 +89,20 @@ const App = () => {
           <Stack.Screen
             name="AgeCompare"
             component={AgeCompare}
-            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
           />
+
+           {/* 알림 페이지 */}
+           <Stack.Screen
+              name="NotificationScreen"
+              component={NotificationScreen}
+              options={{
+               presentation: 'transparentModal', // 모달로 설정
+               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+               }}
+           />
 
           {/* 메뉴 페이지 */}
           <Stack.Screen
@@ -101,7 +116,7 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </MonthlyStaticsProvider>
+    </UserProvider>
   );
 };
 
@@ -183,7 +198,7 @@ export default App;
 //       try {
 //           // Firestore에서 특정 사용자 문서 추가
 //           const userRef = firestore().collection('Users').doc('서연');
-          
+
 //           // 사용자 기본 정보 저장
 //           await userRef.set({
 //               name: '서연',
@@ -192,12 +207,12 @@ export default App;
 //               birth: '2000/01/01',
 //               password: 'hansung',
 //           });
-  
+
 //           // 예산 하위 컬렉션에 데이터 추가
 //           await userRef.collection('budget').doc('2024-11').set({
 //               targetBudget: 500000, // 목표 예산
 //           });
-  
+
 //           // 2024-11-19 하위 컬렉션 추가
 //           const nov19Ref = userRef.collection('2024-11-19');
 //           await nov19Ref.doc('income').set({
@@ -212,7 +227,7 @@ export default App;
 //               time: '21:03',
 //               category: '편의점',
 //           });
-  
+
 //           // 2024-11-22 하위 컬렉션 추가
 //           const nov22Ref = userRef.collection('2024-11-22');
 //           await nov22Ref.doc('income').set({
@@ -227,7 +242,7 @@ export default App;
 //               time: '15:40',
 //               category: '쇼핑',
 //           });
-  
+
 //           console.log('User and budget data added!');
 //           Alert.alert('성공', '데이터가 성공적으로 추가되었습니다.');
 //         } catch (error) {
