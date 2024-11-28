@@ -14,15 +14,15 @@ import CalendarPage from './src/screens/CalendarPage';
 import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // 가정된 context 파일
 import { request, PERMISSIONS } from 'react-native-permissions';
 import firestore from '@react-native-firebase/firestore';
+import { UserProvider } from './src/context/UserContext'; // UserProvider 가져오기
 
-import firebase from '@react-native-firebase/app';
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from '@react-native-firebase/firestore';
+//import firebase from '@react-native-firebase/app';
+//import { initializeApp } from 'firebase/app';
+//import { getFirestore } from '@react-native-firebase/firestore';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  const uid = "서연";
 
   const [permissionGranted, setPermissionGranted] = useState(false);
 
@@ -54,21 +54,21 @@ const App = () => {
     requestPermission();
   }, []);
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDj4c4GHg7h4sFtXI5Q5T_SdWqZOutLSlc",
-    authDomain: "moneybook-a23ea.firebaseapp.com",
-    projectId: "moneybook-a23ea",
-    storageBucket: "moneybook-a23ea.appspot.com",
-    messagingSenderId: "367316691513",
-    appId: "1:367316691513:android:0a50558a38a0b7a9803be8"
-};
-
-  const app = initializeApp(firebaseConfig);
-
-  const db = getFirestore(app);
+//  const firebaseConfig = {
+//    apiKey: "AIzaSyDj4c4GHg7h4sFtXI5Q5T_SdWqZOutLSlc",
+//    authDomain: "moneybook-a23ea.firebaseapp.com",
+//    projectId: "moneybook-a23ea",
+//    storageBucket: "moneybook-a23ea.appspot.com",
+//    messagingSenderId: "367316691513",
+//    appId: "1:367316691513:android:0a50558a38a0b7a9803be8"
+//};
+//
+//  const app = initializeApp(firebaseConfig);
+//
+//  const db = getFirestore(app);
 
   return (
-    <MonthlyStaticsProvider> {/* Context Provider로 감싸기 */}
+    <UserProvider>
       <NavigationContainer>
       <Stack.Navigator initialRouteName="Home" screenOptions = {{headerShown : false}}>
 
@@ -94,7 +94,7 @@ const App = () => {
           <Stack.Screen
             name="MonthlyStatics"
             component={MonthlyStatics} // 컴포넌트 참조 전달
-            initialParams={{ uid }} // uid를 초기 파라미터로 전달
+//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
@@ -104,7 +104,7 @@ const App = () => {
           <Stack.Screen
             name="AgeCompare"
             component={AgeCompare}
-            initialParams={{ uid }} // uid를 초기 파라미터로 전달
+//            initialParams={{ uid }} // uid를 초기 파라미터로 전달
             options={{
               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
             }}
@@ -133,7 +133,7 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </MonthlyStaticsProvider>
+    </UserProvider>
   );
 };
 

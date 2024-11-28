@@ -145,11 +145,11 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     headerContainer: {
-        flexDirection: 'row', 
+        flexDirection: 'row',
         alignItems: 'center',
         position: 'absolute',
-        top: height * 0.01, 
-        left: width * 0.05, 
+        top: height * 0.01,
+        left: width * 0.05,
         zIndex: 1,
     },
     icon: {

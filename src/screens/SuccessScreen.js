@@ -1,84 +1,84 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
-    SafeAreaView,
-    StatusBar,
-    Text,
-    Dimensions,
-    View,
-    Image,
-    StyleSheet, 
-    Platform,
+  SafeAreaView,
+  StatusBar,
+  Text,
+  Dimensions,
+  View,
+  Image,
+  StyleSheet,
+  Platform,
 } from 'react-native';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
+import { UserContext } from '../context/UserContext'; // UserContext 가져오기
 
+function HomeScreen({ navigation, route }) {
+  const { userId, setUserId } = useContext(UserContext); // userId와 setUserId 가져오기
+  const { email: userEmail } = route.params.user;
 
-function HomeScreen( { navigation } ) {
-    const[userID, setUserID] = useState('');
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('Calendar'); // 3초 후 CalendarPage로 이동
+    }, 3000);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const auth = getAuth();
-                const user = auth.currentUser;  // 현재 로그인된 사용자 정보
+    return () => clearTimeout(timer);
+  }, []);
 
-                if (user) {
-                    // Firestore 인스턴스 가져오기
-                    const db = getFirestore();
-                    
-                    // Firestore에서 사용자 정보 조회
-                    const usersRef = collection(db, 'Users');
-                    const q = query(usersRef, where('email', '==', user.email));
-                    const querySnapshot = await getDocs(q);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (!userEmail) {
+          throw new Error('이메일이 전달되지 않았습니다.');
+        }
 
-                    if (!querySnapshot.empty) {
-                        // 첫 번째 일치하는 문서의 데이터에서 이름 가져오기
-                        const userData = querySnapshot.docs[0].data();
-                        console.log('성공적으로 사용자 데이터를 불러왔습니다:', userData);
-                        setUserID(userData.name);  // Firestore에 저장된 이름 사용
-                    } else {
-                        console.log('사용자 문서를 찾을 수 없습니다');
-                        setUserID('Unknown User');
-                    }
-                } else {
-                    console.log('로그인된 사용자가 없습니다');
-                    setUserID('Guest');
-                }
-            } catch (error) {
-                console.error('사용자 데이터 로드 중 오류 발생:', error);
-                setUserID('Error');
-            }
-        };
+        const querySnapshot = await firestore()
+          .collection('Users')
+          .where('email', '==', userEmail)
+          .get();
 
-        fetchUserData();
-    }, []);
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
 
+          setUserId(userData.name || 'Unknown User'); // UserContext에 userId 저장
+        } else {
+          console.log('사용자 문서를 찾을 수 없습니다');
+          setUserId('Unknown User');
+        }
+      } catch (error) {
+        console.error('사용자 데이터 로드 중 오류 발생:', error);
+        setUserId('Error');
+      }
+    };
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle = {Platform.OS == 'ios' ? 'dark-content' : 'light-content'} backgroundColor = "#FFF5DB"/>
+    fetchUserData();
+  }, []);
 
-            <View style = {styles.headerContainer}>
-                <Image 
-                source = { require('../../assets/icons/myIcon.png')} 
-                style = {styles.icon}
-                />
-                <Text style={styles.header}>Money-Book</Text>    
-            </View>
-            
-            <View style={styles.customView} />
-            <View style={styles.customView2} />
-            <View style={styles.customView3} />
-            <View style={styles.customView4} />
+   return (
+        <SafeAreaView style={[styles.container, { flex: 1 }]} edges={['top', 'bottom']}>
+              <StatusBar barStyle = {Platform.OS == 'ios' ? 'dark-content' : 'light-content'} backgroundColor = "#FFF5DB"/>
 
-            {/* 텍스트 및 버튼 배치 */}
-            <View style={styles.content}>
-                <Text style={styles.title}>환영합니다{'\n'}{userID} 님</Text>
-            </View>
+              <View style = {styles.headerContainer}>
+                  <Image
+                  source = { require('../../assets/icons/myIcon.png')}
+                  style = {styles.icon}
+                  />
+                  <Text style={styles.header}>Money-Book</Text>
+              </View>
 
-        </SafeAreaView>
-    );
-}
+              <View style={styles.customView} />
+              <View style={styles.customView2} />
+              <View style={styles.customView3} />
+              <View style={styles.customView4} />
+
+              {/* 텍스트 및 버튼 배치 */}
+              <View style={styles.content}>
+                  <Text style={styles.title}>환영합니다{'\n'} {userId} 님 </Text>
+              </View>
+
+          </SafeAreaView>
+      );
+  }
 
 const { width, height } = Dimensions.get('window');
 
@@ -96,11 +96,11 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     headerContainer: {
-        flexDirection: 'row', 
+        flexDirection: 'row',
         alignItems: 'center',
         position: 'absolute',
-        top: height * 0.01, 
-        left: width * 0.05, 
+        top: height * 0.01,
+        left: width * 0.05,
         zIndex: 1,
     },
     icon: {
@@ -177,7 +177,5 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: height * 1.5,
     },
 });
-
-
 
 export default HomeScreen;

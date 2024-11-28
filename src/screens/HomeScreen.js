@@ -13,17 +13,17 @@ import styles from '../../styles';  // styles.js 파일을 import
 
 function HomeScreen( { navigation } ) {
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { flex: 1 }]} edges={['top', 'bottom']}>
             <StatusBar barStyle = {Platform.OS == 'ios' ? 'dark-content' : 'light-content'} backgroundColor = "#FFF5DB"/>
 
             <View style = {styles.headerContainer}>
-                <Image 
-                source = { require('../../assets/icons/myIcon.png')} 
+                <Image
+                source = { require('../../assets/icons/myIcon.png')}
                 style = {styles.icon}
                 />
-                <Text style={styles.header}>Money-Book</Text>    
+                <Text style={styles.header}>Money-Book</Text>
             </View>
-            
+
             <View style={styles.customView} />
             <View style={styles.customView2} />
             <View style={styles.customView3} />
