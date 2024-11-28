@@ -2,7 +2,7 @@
 // 연령대별 지출 비교 페이지
 
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import MonthPicker from 'react-native-month-year-picker'; // 연도와 월 선택 라이브러리
 import InputField from '../components/ageCompare/InputField';
 import WeeklyChart from '../components/common/CustomChart';
@@ -199,71 +199,73 @@ const AgeCompare = ({ route }) => {
     };
 
   return (
-    <View style={styles.container}>
-      {/* 헤더 */}
-      <Header title="연령대별 지출 비교" />
+      <View style={styles.container}>
+        {/* 헤더 */}
+        <Header title="연령대별 지출 비교" backgroundColor="#FFD38B" marginRight={30} />
 
-      {/* 입력 및 결과 섹션 */}
-      <View style={styles.roundedContainer}>
-        <InputField
-          label="연도, 월 선택"
-          value={selectedDate ? formatDate(selectedDate) : ''} // 선택된 날짜가 없으면 빈 문자열
-          placeholder="날짜를 선택하세요" // 플레이스홀더 추가
-          onIconPress={() => setCalendarVisible(true)} // 아이콘 클릭 시 캘린더 열기
-          isDate
-        />
-
-        <InputField
-          label="내 나이"
-          value={age}
-          onChange={(text) => {
-            if (text === '' || (!isNaN(text) && text.trim() !== '')) setAge(text); // 숫자만 입력 가능
-          }}
-        />
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleConfirmClick}>
-            <Text style={styles.buttonText}>확인</Text>
-          </TouchableOpacity>
-        </View>
-
-
-        {/* 차트 및 요약 데이터 표시 */}
-        {isConfirmed && chartData.length > 0 && (
-          <>
-            <View style={styles.chartWrapper}>
-              <WeeklyChart chartData={chartData} space={18} />
-            </View>
-            <AmountDetail
-              income={myOutcome}
-              outcome={-peerOutcome}
-              isAgeCompare={true} // AgeCompare 페이지에서 사용
-              incomeLabel="내 지출"
-              outcomeLabel="또래 지출"
+        {/* 스크롤 뷰 추가 */}
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* 입력 및 결과 섹션 */}
+          <View style={styles.roundedContainer}>
+            <InputField
+              label="연도, 월 선택"
+              value={selectedDate ? formatDate(selectedDate) : ''} // 선택된 날짜가 없으면 빈 문자열
+              placeholder="날짜를 선택하세요" // 플레이스홀더 추가
+              onIconPress={() => setCalendarVisible(true)} // 아이콘 클릭 시 캘린더 열기
+              isDate
             />
-            <Text style={styles.note}>
-              {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
-                -myOutcome - (peerOutcome)
-              ).toLocaleString()}원 ${
-                -myOutcome > peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
-              }`}
-            </Text>
-          </>
+
+            <InputField
+              label="내 나이"
+              value={age}
+              onChange={(text) => {
+                if (text === '' || (!isNaN(text) && text.trim() !== '')) setAge(text); // 숫자만 입력 가능
+              }}
+            />
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.button} onPress={handleConfirmClick}>
+                <Text style={styles.buttonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* 차트 및 요약 데이터 표시 */}
+            {isConfirmed && chartData.length > 0 && (
+              <>
+                <View style={styles.chartWrapper}>
+                  <WeeklyChart chartData={chartData} space={18} />
+                </View>
+                <AmountDetail
+                  income={myOutcome}
+                  outcome={-peerOutcome}
+                  isAgeCompare={true} // AgeCompare 페이지에서 사용
+                  incomeLabel="내 지출"
+                  outcomeLabel="또래 지출"
+                />
+                <Text style={styles.note}>
+                  {`${formatDate(selectedDate)}은 또래보다 ${Math.abs(
+                    -myOutcome - peerOutcome
+                  ).toLocaleString()}원 ${
+                    -myOutcome > peerOutcome ? '더 사용했어요.' : '덜 사용했어요.'
+                  }`}
+                </Text>
+              </>
+            )}
+          </View>
+        </ScrollView>
+
+        {/* 캘린더 선택 모달 */}
+        {isCalendarVisible && (
+          <MonthPicker
+            onChange={handleConfirmDate} // 날짜 선택 완료
+            value={selectedDate || new Date()} // 현재 선택된 날짜 또는 기본값
+            minimumDate={new Date(2000, 0)} // 최소 선택 가능 날짜
+            maximumDate={new Date()} // 최대 선택 가능 날짜
+            locale="ko" // 한국어 설정
+          />
         )}
       </View>
-
-      {/* 캘린더 선택 모달 */}
-      {isCalendarVisible && (
-        <MonthPicker
-          onChange={handleConfirmDate} // 날짜 선택 완료
-          value={selectedDate || new Date()} // 현재 선택된 날짜 또는 기본값
-          minimumDate={new Date(2000, 0)} // 최소 선택 가능 날짜
-          maximumDate={new Date()} // 최대 선택 가능 날짜
-          locale="ko" // 한국어 설정
-        />
-      )}
-    </View>
-  );
-};
+    );
+  };
 
 export default AgeCompare;
