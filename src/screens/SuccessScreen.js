@@ -13,7 +13,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
 
-function HomeScreen( { navigation } ) {
+function SuccessScreen( { navigation } ) {
     const[userID, setUserID] = useState('');
 
     useEffect(() => {
@@ -51,6 +51,13 @@ function HomeScreen( { navigation } ) {
         };
 
         fetchUserData();
+
+        const timer = setTimeout(() => {
+            navigation.replace('Category'); // 'Category'는 다음 페이지
+        }, 3000);
+
+        return () => clearTimeout(timer);
+
     }, []);
 
 
@@ -180,4 +187,4 @@ const styles = StyleSheet.create({
 
 
 
-export default HomeScreen;
+export default SuccessScreen;

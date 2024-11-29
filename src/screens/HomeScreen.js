@@ -9,7 +9,7 @@ import {
     Image,
 } from 'react-native';
 
-import styles from '../../styles';  // styles.js 파일을 import
+import styles from '../styles/HomeStyles';  // styles.js 파일을 import
 
 function HomeScreen( { navigation } ) {
     return (

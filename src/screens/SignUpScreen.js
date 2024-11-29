@@ -3,7 +3,7 @@ import { SafeAreaView, Text, StyleSheet, StatusBar, Platform, View, TouchableOpa
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from '@react-native-firebase/auth';
 
-function LoginScreen( { navigation } ) {
+function SignUpScreen( { navigation } ) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userID, setUserID] = useState('');
@@ -365,4 +365,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default LoginScreen;
+export default SignUpScreen;
