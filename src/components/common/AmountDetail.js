@@ -72,7 +72,13 @@ const AmountDetail = ({
           {!isAgeCompare && (
             <>
               <Text style={styles.compareChange}>지난 달 대비</Text>
-              <Text style={styles.compareChange}>+{incomeChange?.toLocaleString()}</Text>
+              <Text style={styles.compareChange}>
+                {incomeChange > 0
+                  ? `+${incomeChange?.toLocaleString()}`
+                  : incomeChange < 0
+                  ? `${incomeChange?.toLocaleString()}`
+                  : '0'}
+              </Text>
             </>
           )}
         </TouchableOpacity>
@@ -88,7 +94,13 @@ const AmountDetail = ({
           {!isAgeCompare && (
             <>
               <Text style={styles.compareChange}>지난 달 대비</Text>
-              <Text style={styles.compareChange}>-{outcomeChange?.toLocaleString()}</Text>
+              <Text style={styles.compareChange}>
+                {outcomeChange > 0
+                  ? `+${outcomeChange?.toLocaleString()}`
+                  : outcomeChange < 0
+                  ? `-${outcomeChange?.toLocaleString()}`
+                  : '0'}
+              </Text>
             </>
           )}
         </TouchableOpacity>
