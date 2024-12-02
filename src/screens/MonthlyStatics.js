@@ -169,7 +169,6 @@ const MonthlyStatics = () => {
   };
 
   // 데이터 로드
-  // 일단 화면 전환되면 다시 파이어베이스에서 조회하지 않도록
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -209,7 +208,7 @@ const MonthlyStatics = () => {
             income={income}
             incomeChange={income - lastMonthIncome}
             outcome={outcome}
-            outcomeChange={outcome - lastMonthOutcome}
+            outcomeChange={-outcome + lastMonthOutcome}
             incomeList={incomeList}
             outcomeList={outcomeList}
           />
