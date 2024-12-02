@@ -1,4 +1,4 @@
-//Notification.js
+//NotificationScreen.js
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -12,7 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { fetchBudgetFromFirebase } from './firebase'; // Firebase 데이터 가져오기
+//import { fetchBudgetFromFirebase } from './firebase'; // Firebase 데이터 가져오기
 import firestore from '@react-native-firebase/firestore';
 
 const { width } = Dimensions.get('window');
@@ -67,8 +67,8 @@ const generateNotifications = (budget, outcome) => {
     getData();
   }, []);
 
-// 애니메이션 시작
-  useEffect(() => {
+  // Start slide-in animation when screen loads
+  React.useEffect(() => {
     Animated.timing(translateX, {
       toValue: width * 0.2, // 80% of the screen width
       duration: 300,
