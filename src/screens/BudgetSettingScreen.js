@@ -1,8 +1,9 @@
+//BudgetSettingScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { saveBudgetToFirebase } from './firebase'; // Firebase 설정 파일 import
 
-const BudgetSettings = () => {
+const BudgetSettingScreen = () => {
     const [date, setDate] = useState('2024-02');
     const [targetBudget, setTargetBudget] = useState('300000');
     
@@ -137,4 +138,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default BudgetSettings;
+export default BudgetSettingScreen;
