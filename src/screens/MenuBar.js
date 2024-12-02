@@ -2,7 +2,7 @@
 // 메뉴바 페이지
 
 import React from 'react';
-import { View, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -14,14 +14,48 @@ import {
   faSignOutAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/common/menuBarStyles.js';
+import firestore from '@react-native-firebase/firestore';
 
  const MenuBar = ({ route }) => {
   const { userName, percent } = route.params; // 매개변수 접근
   const navigation = useNavigation(); // navigation 객체 가져오기
 
   const handleMenuClick = (route) => {
-    console.log(`${route} 페이지로 이동`); // 네비게이션 경로 로그
-    navigation.navigate(route); // 화면 전환
+    if(route == 'Logout') {
+      handleLogout();
+    } else {
+      console.log(`${route} 페이지로 이동`); // 네비게이션 경로 로그
+      navigation.navigate(route); // 화면 전환
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "로그아웃",
+      "로그아웃 하시겠습니까?",
+      [
+        {
+          text: "취소",
+          style: "Cancel"
+        },
+        {
+          text: "확인",
+          onPress: async () => {
+            try {
+              navigation.reset({
+                index: 0,
+                routes: [{name : 'Home'}],
+              });
+
+              console.log('로그아웃 성공');
+            } catch (error) {
+              console.error('로그아웃 오류 : ', error);
+              Alert.alert('오류 발생', '로그아웃 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -64,7 +98,7 @@ import styles from '../styles/common/menuBarStyles.js';
                 <Text style={styles.menuText}>이번 달 예산 설정</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuClick('CategoryCheck')}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuClick('Category')}>
                 <FontAwesomeIcon icon={faThList} size={24} color="#fff" />
                 <Text style={styles.menuText}>카테고리별 확인</Text>
               </TouchableOpacity>

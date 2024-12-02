@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import SmsListener from 'react-native-android-sms-listener';
 
@@ -13,11 +14,35 @@ import { useContext } from 'react';
 import { UserContext } from '../context/UserContext'; // UserContext 가져오기
 
 export default function CalendarPage() {
+  const navigation = useNavigation();
   const { userId } = useContext(UserContext); // uid 가져오기
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);  
+
+  // const handleMenuPress = () => {
+  //   const fetchUserInfo = async () => {
+  //     try {
+  //       const userDoc = await firestore().collection('Users').doc(userId).get();
+  //       const userData = userDoc.data();
+        
+  //       // MenuBar로 필요한 정보를 전달하며 이동
+  //       navigation.navigate('MenuBar', {
+  //         userName: userData?.name || "사용자",
+  //         percent: userData?.budgetUsedPercent || "0"
+  //       });
+  //     } catch (error) {
+  //       console.error('사용자 정보 조회 실패:', error);
+  //       navigation.navigate('MenuBar', {
+  //         userName: "사용자",
+  //         percent: "0"
+  //       });
+  //     }
+  //   };
+
+  //   fetchUserInfo();
+  // };
 
   // 카테고리 구분
   const categoryKeywords = {
@@ -239,7 +264,9 @@ export default function CalendarPage() {
 
   return (
     <View style={styles.container}>
-      <Header title="Calendar" backgroundColor='#FFF7EA' isCalendar={true} />
+      <StatusBar barStyle = {Platform.OS == 'ios' ? 'dark-content' : 'light-content'} backgroundColor = "#FFF7EA"/>
+
+      <Header title="Calendar" backgroundColor='#FFF7EA' isCalendar={true}/>
 
       {/* 맨 위 여백 => 추후 햄버거 바&알림버튼으로 변경 */}
       <View style={{ marginTop: 0 }} />
