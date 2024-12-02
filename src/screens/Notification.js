@@ -17,73 +17,56 @@ import firestore from '@react-native-firebase/firestore';
 const { width } = Dimensions.get('window');
 
 const NotificationScreen = () => {
-  const [budget, setBudget] = useState(0); // 현재 달 예산
-  const [outcome, setOutcome] = useState(0); // 이번 달 지출
+  const [budgetSetting, setBudgetSetting] = useState(0); // 설정된 예산
+  const [totalOutcome, setTotalOutcome] = useState(0); // 총 지출
+  const [notifications, setNotifications] = useState([]); // 알림 메시지 저장
   const [date] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
-  const [notifications, setNotifications] = useState([]);
   const [translateX] = useState(new Animated.Value(width)); // Animation initial state
-
   const navigation = useNavigation();
 
-  // Firebase 데이터 가져오기 함수
-  const fetchData = useCallback(async () => {
+  // Firestore 데이터 가져오기
+  const getData = async () => {
     try {
-      // 예산 데이터 가져오기
-      const budgetData = await fetchBudgetFromFirebase(date);
-      if (budgetData) {
-        setBudget(parseInt(budgetData.targetBudget, 10));
-      }
-
-      // 지출 데이터 가져오기
-      const outcomeData = await firestore()
-        .collection('Users')
-        .doc('yourUserId') // 적절한 사용자 ID를 넣으세요
-        .collection(date)
-        .doc('outcome')
-        .get();
-
-      if (outcomeData.exists) {
-        const transactions = outcomeData.data().transactions || {};
-        const totalOutcome = Object.values(transactions).reduce(
-          (sum, transaction) => sum + (transaction.money || 0),
-          0
-        );
-        setOutcome(totalOutcome);
+      const BudgetDoc = await firestore().collection('Budget').doc(date).get(); // date로 데이터 가져오기
+      if (BudgetDoc.exists) {
+        const data = BudgetDoc.data();
+        setBudgetSetting(data.BudgetSetting || 0); // budgetSetting 가져오기
+        setTotalOutcome(data.totalOutcome || 0); // TotalOutcome 가져오기
+        generateNotifications(data.BudgetSetting, data.totalOutcome); // 알림 생성
+      } else {
+        console.log('확인되는 문서 없음');
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      Alert.alert('오류', '데이터를 가져오는 중 문제가 발생했습니다.');
+      console.error('Error fetching data from Firestore:', error);
     }
-  }, [date]);
+  };
 
-  // 알림 생성 로직
+// 알림 메시지 생성
+const generateNotifications = (budget, outcome) => {
+  const messages = [];
+  const usagePercentage = (outcome / budget) * 100;
+
+  // 오늘 날짜 형식: YYYY.MM.DD
+  const today = new Date();
+  const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
+  if (usagePercentage >= 90) {
+    messages.push({ id: 1, message: `${date} 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
+  } 
+  if (usagePercentage >= 50 && usagePercentage < 90) { // 90% 미만인 경우 추가 조건
+    messages.push({ id: 2, message: `${date} 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
+  }
+
+  setNotifications(messages);
+};
+
+
+  // 초기 데이터 로드
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    getData();
+  }, []);
 
-  useEffect(() => {
-    const tempNotifications = [];
-    if (budget > 0) {
-      const usagePercentage = (outcome / budget) * 100;
-      if (usagePercentage >= 50 && usagePercentage < 90) {
-        tempNotifications.push({
-          id: '1', // 고유 ID
-          message: `${date} 예산의 50%를 사용했습니다.`,
-          date: `${date}`,
-        });
-      }
-      if (usagePercentage >= 90) {
-        tempNotifications.push({
-          id: '2', // 고유 ID
-          message: `${date} 예산의 90%를 사용했습니다.`,
-          date: `${date}`,
-        });
-      }
-    }
-    setNotifications(tempNotifications);
-  }, [budget, outcome, date]);
-
-  // 애니메이션 시작
+// 애니메이션 시작
   useEffect(() => {
     Animated.timing(translateX, {
       toValue: width * 0.2, // 80% of the screen width
@@ -91,8 +74,8 @@ const NotificationScreen = () => {
       useNativeDriver: true,
     }).start();
   }, []);
-
-  // 알림 삭제
+  
+// 알림 삭제
   const handleDelete = (id) => {
     setNotifications(notifications.filter((notification) => notification.id !== id));
   };
@@ -202,3 +185,32 @@ const styles = StyleSheet.create({
 });
 
 export default NotificationScreen;
+
+/*
+  // 알림 생성 로직
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const tempNotifications = [];
+    if (budget > 0) {
+      const usagePercentage = (outcome / budget) * 100;
+      if (usagePercentage >= 50 && usagePercentage < 90) {
+        tempNotifications.push({
+          id: '1', // 고유 ID
+          message: `${date} 예산의 50%를 사용했습니다.`,
+          date: `${date}`,
+        });
+      }
+      if (usagePercentage >= 90) {
+        tempNotifications.push({
+          id: '2', // 고유 ID
+          message: `${date} 예산의 90%를 사용했습니다.`,
+          date: `${date}`,
+        });
+      }
+    }
+    setNotifications(tempNotifications);
+  }, [budget, outcome, date]);
+*/
