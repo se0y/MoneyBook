@@ -15,9 +15,16 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/common/menuBarStyles.js';
 
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext'; // UserContext 가져오기
+import { BudgetOutcomeContext } from '../context/BudgetOutcomeContext';
+
  const MenuBar = ({ route }) => {
-  const { userName, percent } = route.params; // 매개변수 접근
+  const { userId } = useContext(UserContext); // userId 가져오기
+  const { percentage } = useContext(BudgetOutcomeContext); // 예산 퍼센트 가져오기
   const navigation = useNavigation(); // navigation 객체 가져오기
+
+  console.log(`퍼센트: ${percentage}`);
 
   const handleMenuClick = (route) => {
     console.log(`${route} 페이지로 이동`); // 네비게이션 경로 로그
@@ -35,9 +42,9 @@ import styles from '../styles/common/menuBarStyles.js';
             {/* 상단 사용자 정보 */}
             <View style={styles.header}>
               <FontAwesomeIcon icon={faUsers} size={40} color="#fff" style={styles.icon} />
-              <Text style={styles.userText}>안녕하세요. {userName}님</Text>
+              <Text style={styles.userText}>안녕하세요. {userId}님</Text>
               <Text style={styles.userSubText}>
-                이번 달 목표 금액의 {percent}%를 사용하셨어요
+                이번 달 목표 금액의 {percentage}%를 사용하셨어요
               </Text>
             </View>
 
