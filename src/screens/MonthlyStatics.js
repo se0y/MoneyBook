@@ -2,7 +2,7 @@
 // 월별 통계 페이지
 
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, ActivityIndicator } from 'react-native';
+import { View, FlatList, ActivityIndicator, StatusBar } from 'react-native';
 import AmountSummary from '../components/monthlyStatics/AmountSummary';
 import Header from '../components/common/Header';
 import BudgetIndicator from '../components/monthlyStatics/BudgetIndicator';
@@ -227,6 +227,7 @@ const MonthlyStatics = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle = {Platform.OS == 'ios' ? 'dark-content' : 'light-content'} backgroundColor = "#FFD38B"/>
       <FlatList
         data={sections}
         keyExtractor={(item) => item.key}
