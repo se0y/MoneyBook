@@ -12,54 +12,16 @@ import {
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import firestore from '@react-native-firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
 const NotificationScreen = () => {
   const [budgetSetting, setBudgetSetting] = useState(0); // 설정된 예산
-  const [totalOutcome, setTotalOutcome] = useState(0); // 총 지출
   const [notifications, setNotifications] = useState([]); // 알림 메시지 저장
   const [date] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
   const [translateX] = useState(new Animated.Value(width)); // Animation initial state
   const navigation = useNavigation();
-
-  // Firestore 데이터 가져오기
-  const getData = async () => {
-    try {
-      const BudgetDoc = await firestore().collection('Budget').doc(date).get(); // date로 데이터 가져오기
-      if (BudgetDoc.exists) {
-        const data = BudgetDoc.data();
-        setBudgetSetting(data.BudgetSetting || 0); // budgetSetting 가져오기
-        setTotalOutcome(data.totalOutcome || 0); // TotalOutcome 가져오기
-        generateNotifications(data.BudgetSetting, data.totalOutcome); // 알림 생성
-      } else {
-        console.log('확인되는 문서 없음');
-      }
-    } catch (error) {
-      console.error('Error fetching data from Firestore:', error);
-    }
-  };
-
-// 알림 메시지 생성
-const generateNotifications = (budget, outcome) => {
-  const messages = [];
-  const usagePercentage = (outcome / budget) * 100;
-
-  // 오늘 날짜 형식: YYYY.MM.DD
-  const today = new Date();
-  const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-
-  if (usagePercentage >= 90) {
-    messages.push({ id: 1, message: `${date} 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
-  } 
-  if (usagePercentage >= 50 && usagePercentage < 90) { // 90% 미만인 경우 추가 조건
-    messages.push({ id: 2, message: `${date} 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
-  }
-
-  setNotifications(messages);
-};
 
   // 오늘 날짜에 해당하는 targetBudget 가져오기
   const getData = async () => {

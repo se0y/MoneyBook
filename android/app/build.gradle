@@ -47,16 +47,9 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation platform('com.google.firebase:firebase-bom:33.5.1')
     implementation 'com.google.firebase:firebase-analytics'
-<<<<<<< HEAD
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
-    
-=======
 
-    implementation("com.google.firebase-inappmessaging-display-ktx")
-    implementation("com.google.firebase:firebase-analytics-ktx")
-
->>>>>>> origin/renee
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
