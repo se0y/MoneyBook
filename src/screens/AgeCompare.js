@@ -142,7 +142,7 @@ const AgeCompare = () => {
   };
 
 
-  // 또래 지출 조회
+   // 또래 지출 조회
     const fetchPeerOutcome = async (age) => {
       try {
         // age를 기준으로 또래 나이 그룹 계산

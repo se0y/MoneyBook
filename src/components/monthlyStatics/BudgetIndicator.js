@@ -13,7 +13,7 @@ const BudgetIndicator = ({ budget, outcome }) => {
   // 퍼센트 계산 함수
   const getOutComePercent = (budget, outcome) => {
     if (budget === 0) return 0; // 예산이 0인 경우 퍼센트를 0으로 설정
-    return Math.min((outcome / budget) * 100, 100); // 최대 퍼센트는 100%로 제한
+    return Math.min((outcome / budget) * 100, 100).toFixed(2);
   };
 
   // 퍼센트 계산 및 상태 업데이트
