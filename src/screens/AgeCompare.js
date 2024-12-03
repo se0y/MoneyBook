@@ -14,7 +14,6 @@ import firestore from '@react-native-firebase/firestore';
 import { useContext } from 'react';
 import { UserContext } from '../context/UserContext'; // UserContext 가져오기
 
-
 const AgeCompare = () => {
   const { userId } = useContext(UserContext); // userId 가져오기
 
@@ -53,11 +52,10 @@ const AgeCompare = () => {
   };
 
   // 주차별 데이터 조회
-  const fetchWeeklyData = async (userId, year, month) => {
+  const fetchWeeklyData = async (userId, year, month, monthPrefix) => {
     try {
       const userRef = firestore().collection('Users').doc(userId);
 
-      const monthPrefix = `${year}-${String(month).padStart(2, '0')}`;
       const availableDatesSnapshot = await userRef.get();
 
       if (!availableDatesSnapshot.exists) {
@@ -143,19 +141,19 @@ const AgeCompare = () => {
 
 
    // 또래 지출 조회
-    const fetchPeerOutcome = async (age) => {
+    // 또래 지출 조회
+    const fetchPeerOutcome = async (age, monthPrefix) => {
       try {
-        // age를 기준으로 또래 나이 그룹 계산
+        // 나이 그룹 계산 (10대, 20대, ...)
         const peerAge = age < 10 ? 0 : parseInt(age.toString()[0] + '0', 10);
-
         console.log('Peer Age Group:', peerAge);
 
-        // Firestore 참조
+        // Firestore에서 선택된 연도-월에 해당하는 또래 지출 데이터 가져오기
         const peerOutcomeRef = firestore()
           .collection('PeerOutcome')
           .doc(peerAge.toString()) // 나이 그룹
           .collection('peer')
-          .doc('outcome');
+          .doc(monthPrefix); // 연도-월
 
         // Firestore 데이터 가져오기
         const peerDoc = await peerOutcomeRef.get();
@@ -188,11 +186,12 @@ const AgeCompare = () => {
 
       try {
         setLoading(true);
+        const monthPrefix = `${year}-${String(month).padStart(2, '0')}`;
 
         console.log(`Calling fetchWeeklyData with Year: ${year}, Month: ${month}`);
-        await fetchWeeklyData(userId, year, month); // year와 month 전달
+        await fetchWeeklyData(userId, year, month, monthPrefix); // year와 month 전달
 
-        const peerOutcome = await fetchPeerOutcome(age);
+        const peerOutcome = await fetchPeerOutcome(age, monthPrefix);
         setPeerOutcome(peerOutcome);
 
         setIsConfirmed(true); // 데이터 확인 상태로 변경
