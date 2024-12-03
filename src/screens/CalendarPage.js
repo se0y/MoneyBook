@@ -19,30 +19,8 @@ export default function CalendarPage() {
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);  
-
-  // const handleMenuPress = () => {
-  //   const fetchUserInfo = async () => {
-  //     try {
-  //       const userDoc = await firestore().collection('Users').doc(userId).get();
-  //       const userData = userDoc.data();
-        
-  //       // MenuBar로 필요한 정보를 전달하며 이동
-  //       navigation.navigate('MenuBar', {
-  //         userName: userData?.name || "사용자",
-  //         percent: userData?.budgetUsedPercent || "0"
-  //       });
-  //     } catch (error) {
-  //       console.error('사용자 정보 조회 실패:', error);
-  //       navigation.navigate('MenuBar', {
-  //         userName: "사용자",
-  //         percent: "0"
-  //       });
-  //     }
-  //   };
-
-  //   fetchUserInfo();
-  // };
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [update, setUpate] = useState([]);
 
   // 카테고리 구분
   const categoryKeywords = {
@@ -154,10 +132,10 @@ export default function CalendarPage() {
 
       await docRef.update({
           transactions: firestore.FieldValue.arrayRemove({
-          category: transaction.category,
-          memo: transaction.memo,
-          money: transaction.money,
-          time: transaction.time,
+            category: transaction.category,
+            memo: transaction.memo,
+            money: transaction.money,
+            time: transaction.time,
         }),
       });
 
@@ -167,7 +145,26 @@ export default function CalendarPage() {
     }
   };
 
-  // TransactionList의 삭제 함수 핸들러
+  // 수정 시, 모달 띄우기
+  const handleUpdateModal = async (transaction) => {
+    openModal();
+    setUpate(transaction);
+    console.log(transaction);
+  }
+
+  // 데이터 수정 함수
+  const handleUpdateTransaction = async (data, newData, date) => {
+    
+    const selectedDate = date || selectedDate; // 바텀시트에서 날짜 바꿨으면 그걸로 저장, 안바꿨으면 기존에 클릭한 날짜로 저장
+
+    await deleteTransaction(userId, selectedDate, data);
+    await addTransaction(userId, selectedDate, newData); // Firestore에 데이터 추가
+
+    onDateSelect(selectedDate); // 해당 날짜로 캘린더 클릭 & 데이터 조회   
+    setUpate([]);
+  };
+
+  // 길게 누르면 삭제하는 함수 핸들러
   const handleDeleteTransaction = async (transaction) => {
     if (selectedDate && userId) {
       await deleteTransaction(userId, selectedDate, transaction);
@@ -191,13 +188,16 @@ export default function CalendarPage() {
 
   // 모달 열기 및 닫기 함수
   const openModal = () => setIsModalVisible(true);
-  const closeModal = () => setIsModalVisible(false);
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setTransactions([]);
+    onDateSelect(selectedDate);
+  };
 
 
   // handleSaveTransaction 함수 정의
   // 저장 버튼 클릭 시 데이터 추가
   const handleSaveTransaction = async (data, date) => {
-//    const userId = '서연'; // (유저id 받아오면 수정할 것)
     const selectedDate = date || selectedDate; // 바텀시트에서 날짜 바꿨으면 그걸로 저장, 안바꿨으면 기존에 클릭한 날짜로 저장
 
     await addTransaction(userId, selectedDate, data); // Firestore에 데이터 추가
@@ -314,7 +314,7 @@ export default function CalendarPage() {
       <View style={styles.divider} />
 
       {/* 날짜별 내역 */}
-      <TransactionList transactions={transactions} onDeleteTransaction={handleDeleteTransaction} />
+      <TransactionList transactions={transactions} onDeleteTransaction={handleDeleteTransaction} onUpdateTransaction={handleUpdateModal}/>
 
       {/* 플로팅 버튼 (모달 열기) */}
       <FloatingButton onPress={openModal} />
@@ -325,6 +325,8 @@ export default function CalendarPage() {
         onClose={closeModal}
         onSave={handleSaveTransaction}
         selectedDate={selectedDate} // 선택된 날짜 전달
+        transaction={update}
+        onUpdate={handleUpdateTransaction}
       />
     </View>
   );

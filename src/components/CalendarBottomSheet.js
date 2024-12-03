@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, StyleSheet, View, Text, TextInput, Image, Pressable, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
+const CalendarModal = ({ isVisible, onClose, onSave, selectedDate, transaction, onUpdate }) => {
   const [amount, setAmount] = useState('');
   const [memo, setMemo] = useState('');
   const [category, setCategory] = useState('');
@@ -16,7 +16,16 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
     if (selectedDate) {
       setDate(selectedDate); // selectedDate가 변경될 때마다 setDate 호출
     }
-  }, [selectedDate]); // selectedDate가 변경될 때마다 실행
+
+    if (transaction) {
+      setAmount(transaction.money?.toString() || '');
+      setMemo(transaction.memo || '');
+      setCategory(transaction.category || '');
+      setTime(transaction.time || '');
+      setDate(transaction.date || selectedDate);
+    }
+
+  }, [transaction, selectedDate]); // selectedDate가 변경될 때마다 실행
 
   console.log('전달받은 날짜', selectedDate)
   console.log('useState 설정한 날짜', date)
@@ -49,8 +58,14 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
       category: finalCategory,
       date: date,
     };
-    console.log('transactionData : ', transactionData);
-    onSave(transactionData, date); // 부모 컴포넌트로 데이터 전달
+    if (transaction.length === 0) {
+      console.log('새로 저장:', transactionData);
+      onSave(transactionData, date); // 부모 컴포넌트로 데이터 전달 (저장용)
+    } else {
+      console.log('수정전 transaction:', transaction);
+      console.log('수정:', transactionData);
+      onUpdate(transaction, transactionData, date); // 부모 컴포넌트로 데이터 전달 (업데이트용)
+    }
     onClose(); // 모달 닫기
 
     // 데이터 추가하고 나면 모달 입력값 초기화
@@ -79,10 +94,6 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate }) => {
     }
     setTimePickerVisible(false); // DateTimePicker 숨기기
   };
-
-  // const handleCancelTime = () => {
-  //   setTimePickerVisible(false); // DateTimePicker 숨기기
-  // };
 
   return (
     <Modal

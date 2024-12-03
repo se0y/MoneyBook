@@ -3,7 +3,7 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, Text, Image, Alert, TouchableHighlight } from 'react-native';
 
-const TransactionList = ({ transactions, onDeleteTransaction }) => {
+const TransactionList = ({ transactions, onDeleteTransaction, onUpdateTransaction }) => {
   
   // 카테고리에 맞는 아이콘 반환
   const getCategoryImage = (category) => {
@@ -23,7 +23,13 @@ const TransactionList = ({ transactions, onDeleteTransaction }) => {
     }
   };
 
+  const handlePress = (transaction) => {
+    // console.log(transaction);
+    onUpdateTransaction(transaction);
+  };
+
   const handleLongPress = (transaction) => {
+    console.log(transaction);
     Alert.alert(
       '삭제 확인',
       `'${transaction.memo}'를 삭제하시겠습니까?`,
@@ -45,6 +51,7 @@ const TransactionList = ({ transactions, onDeleteTransaction }) => {
   
     return (
       <TouchableHighlight
+        onPress={() => handlePress(item)} // 프레스 이벤트
         onLongPress={() => handleLongPress(item)} // 롱프레스 이벤트
         underlayColor="#FFE5B4" // 누를 때의 배경색
       >
