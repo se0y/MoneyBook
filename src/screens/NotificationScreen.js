@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+v//NotificationScreen.js
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,18 +9,63 @@ import {
   Animated,
   Dimensions,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+//import { fetchBudgetFromFirebase } from './firebase'; // Firebase 데이터 가져오기
+import firestore from '@react-native-firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
-const NotificationScreen = ({ route }) => {
-  const navigation = useNavigation();
+const NotificationScreen = () => {
+  const [budgetSetting, setBudgetSetting] = useState(0); // 설정된 예산
+  const [totalOutcome, setTotalOutcome] = useState(0); // 총 지출
+  const [notifications, setNotifications] = useState([]); // 알림 메시지 저장
+  const [date] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
   const [translateX] = useState(new Animated.Value(width)); // Animation initial state
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: '8월 설정 예산의 90%를 사용하셨어요', date: '2024.08.20' },
-    { id: 2, message: '8월 설정 예산의 50%를 사용하셨어요', date: '2024.08.14' },
-  ]);
+  const navigation = useNavigation();
+
+  // Firestore 데이터 가져오기
+  const getData = async () => {
+    try {
+      const BudgetDoc = await firestore().collection('Budget').doc(date).get(); // date로 데이터 가져오기
+      if (BudgetDoc.exists) {
+        const data = BudgetDoc.data();
+        setBudgetSetting(data.BudgetSetting || 0); // budgetSetting 가져오기
+        setTotalOutcome(data.totalOutcome || 0); // TotalOutcome 가져오기
+        generateNotifications(data.BudgetSetting, data.totalOutcome); // 알림 생성
+      } else {
+        console.log('확인되는 문서 없음');
+      }
+    } catch (error) {
+      console.error('Error fetching data from Firestore:', error);
+    }
+  };
+
+// 알림 메시지 생성
+const generateNotifications = (budget, outcome) => {
+  const messages = [];
+  const usagePercentage = (outcome / budget) * 100;
+
+  // 오늘 날짜 형식: YYYY.MM.DD
+  const today = new Date();
+  const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
+  if (usagePercentage >= 90) {
+    messages.push({ id: 1, message: `${date} 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
+  } 
+  if (usagePercentage >= 50 && usagePercentage < 90) { // 90% 미만인 경우 추가 조건
+    messages.push({ id: 2, message: `${date} 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
+  }
+
+  setNotifications(messages);
+};
+
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    getData();
+  }, []);
 
   // Start slide-in animation when screen loads
   React.useEffect(() => {
@@ -29,14 +75,14 @@ const NotificationScreen = ({ route }) => {
       useNativeDriver: true,
     }).start();
   }, []);
-
+  
+// 알림 삭제
   const handleDelete = (id) => {
     setNotifications(notifications.filter((notification) => notification.id !== id));
   };
 
   return (
     <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
-      {/* Dismiss on outside press */}
       <View style={styles.overlay}>
         <Animated.View
           style={[
@@ -49,17 +95,21 @@ const NotificationScreen = ({ route }) => {
           <View style={styles.container}>
             <Text style={styles.header}>알림 내역</Text>
             <ScrollView>
-              {notifications.map((notification) => (
-                <TouchableOpacity
-                  key={notification.id}
-                  style={styles.notificationBox}
-                  onPress={() => handleDelete(notification.id)}
-                >
-                  <Text style={styles.alert}>경고</Text>
-                  <Text style={styles.message}>{notification.message}</Text>
-                  <Text style={styles.date}>{notification.date}</Text>
-                </TouchableOpacity>
-              ))}
+              {notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <TouchableOpacity
+                    key={notification.id}
+                    style={styles.notificationBox}
+                    onPress={() => handleDelete(notification.id)}
+                  >
+                    <Text style={styles.alert}>경고</Text>
+                    <Text style={styles.message}>{notification.message}</Text>
+                    <Text style={styles.date}>{notification.date}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.noNotifications}>현재 알림이 없습니다.</Text>
+              )}
             </ScrollView>
           </View>
         </Animated.View>
@@ -136,3 +186,32 @@ const styles = StyleSheet.create({
 });
 
 export default NotificationScreen;
+
+/*
+  // 알림 생성 로직
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const tempNotifications = [];
+    if (budget > 0) {
+      const usagePercentage = (outcome / budget) * 100;
+      if (usagePercentage >= 50 && usagePercentage < 90) {
+        tempNotifications.push({
+          id: '1', // 고유 ID
+          message: `${date} 예산의 50%를 사용했습니다.`,
+          date: `${date}`,
+        });
+      }
+      if (usagePercentage >= 90) {
+        tempNotifications.push({
+          id: '2', // 고유 ID
+          message: `${date} 예산의 90%를 사용했습니다.`,
+          date: `${date}`,
+        });
+      }
+    }
+    setNotifications(tempNotifications);
+  }, [budget, outcome, date]);
+*/

@@ -20,3 +20,9 @@ export default function AppNavigator() {
         </NavigationContainer>
     );
 }
+
+
+{/* 로그인 성공 후 Calendar 화면으로 이동 */}
+//<Stack.Screen name="Calendar" component={CalendarScreen} options={{ title: '캘린더' }} />               
+{/* MenuBar에서 예산 설정 화면으로 이동 */}
+//<Stack.Screen name="BudgetSettings" component={BudgetSettings} options={{ title: '이번 달 예산 설정' }} />
