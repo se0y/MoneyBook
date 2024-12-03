@@ -142,9 +142,38 @@ export default function CalendarPage() {
       console.error('데이터 추가 오류:', error);
     }
   };
-  
-  // availableDates 추가 함수
 
+  // Firestore에서 데이터 삭제
+  const deleteTransaction = async (userId, date, transaction) => {
+    try {
+      const userRef = firestore().collection('Users').doc(userId);
+      const dateRef = userRef.collection(date); // 선택된 날짜의 서브컬렉션 참조
+      const docName = transaction.money > 0 ? 'income' : 'outcome'; // 양수면 income, 음수면 outcome
+    
+      const docRef = dateRef.doc(docName);
+
+      await docRef.update({
+          transactions: firestore.FieldValue.arrayRemove({
+          category: transaction.category,
+          memo: transaction.memo,
+          money: transaction.money,
+          time: transaction.time,
+        }),
+      });
+
+      console.log("거래 내역 삭제 완료:", transaction);
+    } catch (error) {
+      console.error("거래 내역 삭제 실패:", error);
+    }
+  };
+
+  // TransactionList의 삭제 함수 핸들러
+  const handleDeleteTransaction = async (transaction) => {
+    if (selectedDate && userId) {
+      await deleteTransaction(userId, selectedDate, transaction);
+      onDateSelect(selectedDate); // 삭제 후 다시 데이터 로드
+    }
+  };
 
   // 날짜 선택 시 데이터 업데이트
   const onDateSelect = async (day) => {
@@ -285,7 +314,7 @@ export default function CalendarPage() {
       <View style={styles.divider} />
 
       {/* 날짜별 내역 */}
-      <TransactionList transactions={transactions} />
+      <TransactionList transactions={transactions} onDeleteTransaction={handleDeleteTransaction} />
 
       {/* 플로팅 버튼 (모달 열기) */}
       <FloatingButton onPress={openModal} />

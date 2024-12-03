@@ -1,9 +1,9 @@
 // TransactionList.js
 
 import React from 'react';
-import { View, FlatList, StyleSheet, Text, Image } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Image, Alert, TouchableHighlight } from 'react-native';
 
-const TransactionList = ({ transactions }) => {
+const TransactionList = ({ transactions, onDeleteTransaction }) => {
   
   // 카테고리에 맞는 아이콘 반환
   const getCategoryImage = (category) => {
@@ -23,11 +23,31 @@ const TransactionList = ({ transactions }) => {
     }
   };
 
+  const handleLongPress = (transaction) => {
+    Alert.alert(
+      '삭제 확인',
+      `'${transaction.memo}'를 삭제하시겠습니까?`,
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: () => onDeleteTransaction(transaction), // 삭제 함수 호출
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const renderItem = ({ item }) => {
     // 카테고리별 아이콘 불러오기
     const categoryIcon = getCategoryImage(item.category);
   
     return (
+      <TouchableHighlight
+        onLongPress={() => handleLongPress(item)} // 롱프레스 이벤트
+        underlayColor="#FFE5B4" // 누를 때의 배경색
+      >
       <View style={styles.itemContainer}>
         {/* 카테고리별 아이콘 */}
         <Image source={categoryIcon} style={styles.icon} />
@@ -42,6 +62,7 @@ const TransactionList = ({ transactions }) => {
           {item.money > 0 ? `+${item.money}` : `${item.money}`}
         </Text>
       </View>
+      </TouchableHighlight>
     );
   };
 
