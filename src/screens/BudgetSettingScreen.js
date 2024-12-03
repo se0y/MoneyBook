@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { saveBudgetToFirebase } from './firebase'; // Firebase 설정 파일 import
+import { useNavigation } from '@react-navigation/native';
 
 const BudgetSettingScreen = () => {
+    const navigation = useNavigation();
     const [date, setDate] = useState('2024-02');
     const [targetBudget, setTargetBudget] = useState('300000');
     

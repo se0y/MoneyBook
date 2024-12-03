@@ -10,18 +10,19 @@ import {
     Dimensions,
     Image,
 } from 'react-native';
+import Header from '../components/common/Header';
 
-function Categoty( { navigation } ) {
+function Category( { navigation } ) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle = {Platform.OS == 'ios' ? 'dark-content' : 'light-content'} backgroundColor = "#FFF7EA"/>
 
             <View style={styles.headerContainer}>
-                <TouchableOpacity style={styles.menuButton}>
-                    
-                </TouchableOpacity>
+                <Header title="카테고리별 확인" backgroundColor="#FFF7EA" marginRight={30} />
             </View>
+            
             <Text style={styles.title}>카테고리</Text>
+
             {/* 텍스트 및 버튼 배치 */}
             <View style={styles.gridContainer}>
                 {[
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '800',
         marginTop: Platform.OS === 'ios' ? height * 0.04 : height * -0.43,
-        marginBottom: height * 0.03,
+        marginBottom: height * 0.01,
         color: '#000000',
         fontFamily: 'Pridi-Bold',
     },
@@ -129,4 +130,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Categoty;
+export default Category;
