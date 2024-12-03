@@ -1,14 +1,13 @@
 //BudgetSettingScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { saveBudgetToFirebase } from './firebase'; // Firebase 설정 파일 import
-import { useNavigation } from '@react-navigation/native';
+import { saveBudgetToFirebase } from '../firebase'; // Firebase 설정 파일 import
+import Header from '../components/common/Header';
 
 const BudgetSettingScreen = () => {
-    const navigation = useNavigation();
     const [date, setDate] = useState('2024-02');
     const [targetBudget, setTargetBudget] = useState('300000');
-    
+
     const handleSave = async () => {
         console.log('현재 상태:', { date, targetBudget });
 
@@ -43,9 +42,7 @@ const BudgetSettingScreen = () => {
     return (
         <View style={styles.container}>
             {/* 헤더 */}
-            <View style={styles.headerContainer}>
-                <Text style={styles.header}>이번 달 예산 설정</Text>
-            </View>
+        <Header title="예산 설정" backgroundColor="#FFD38B" marginRight={30} />
 
             <View style={styles.box}>
                 <View style={styles.inputContainer}>
