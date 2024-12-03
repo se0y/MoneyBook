@@ -89,22 +89,60 @@ const NotificationScreen = () => {
     const today = new Date();
     const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
 
+
+    if (usagePercentage >= 100) {
+      messages.push({ id: 1, message: `${formattedDate}: 설정 예산의 100%를 사용하셨습니다.`, date: formattedDate });
+    }
+
     if (usagePercentage >= 90) {
-      messages.push({ id: 1, message: `${formattedDate}: 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
+      messages.push({ id: 2, message: `${formattedDate}: 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
     }
     if (usagePercentage >= 50 && usagePercentage < 90) { // 90% 미만인 경우 추가 조건
-      messages.push({ id: 2, message: `${formattedDate}: 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
+      messages.push({ id: 3, message: `${formattedDate}: 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
     }
 
     setNotifications(messages);
   };
 
+    // Firestore 실시간 업데이트 구독 (transaction 배열 추가 시 totalOutcome 업데이트)
+    const subscribeToTransactions = () => {
+      const userId = '서연';
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+      const targetDate = `${currentYear}-${currentMonth}`;
+  
+      const userRef = firestore().collection('Users').doc(userId);
+      const transactionsRef = userRef.collection('budget').doc(targetDate);
+  
+      transactionsRef.onSnapshot(async (docSnapshot) => {
+        if (docSnapshot.exists) {
+          const transactions = docSnapshot.data().transactions || [];
+          await calculateTotalOutcome(); // transaction 추가 또는 변경 시 calculateTotalOutcome 실행
+        }
+      });
+    };
+
   // 초기 데이터 로드
   useEffect(() => {
     getData();
+    subscribeToTransactions(); // transaction 배열에 변화가 있을 때마다 실행
   }, []);
 
-  // Start slide-in animation when screen loads
+  /*
+  useEffect(() => {
+  getData();
+  const unsubscribe = subscribeToTransactions(); // 구독 설정
+
+  // 컴포넌트 언마운트 시 구독 해제
+  return () => {
+    unsubscribe(); // onSnapshot 리턴값으로 구독 해제
+  };
+}, []);
+
+  */ 
+
+// Start slide-in animation when screen loads
   React.useEffect(() => {
     Animated.timing(translateX, {
       toValue: width * 0.2, // 80% of the screen width
