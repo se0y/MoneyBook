@@ -72,6 +72,7 @@ function LoginScreen({ navigation }) {
         style={{ flex: 1, width: '100%', alignContent: 'center' }}
         keyboardVerticalOffset={80}
       >
+        <StatusBar barStyle = {Platform.OS == 'ios' ? 'dark-content' : 'light-content'} backgroundColor = "#337D69"/>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, width: '100%', alignItems: 'center' }}
           keyboardShouldPersistTaps="handled"

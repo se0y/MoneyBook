@@ -1,8 +1,8 @@
 // src/screens/MenuBar.js
 // 메뉴바 페이지
 
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import React from 'react';
+import { View, Text, Alert, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
@@ -92,8 +92,41 @@ const MenuBar = ({ route }) => {
   }, [outcome, budget]); // outcome과 budget이 변경될 때마다 실행
 
   const handleMenuClick = (route) => {
-    console.log(`${route} 페이지로 이동`); // 네비게이션 경로 로그
-    navigation.navigate(route); // 화면 전환
+    if(route == 'Logout') {
+      handleLogout();
+    } else {
+      console.log(`${route} 페이지로 이동`); // 네비게이션 경로 로그
+      navigation.navigate(route); // 화면 전환
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "로그아웃",
+      "로그아웃 하시겠습니까?",
+      [
+        {
+          text: "취소",
+          style: "Cancel"
+        },
+        {
+          text: "확인",
+          onPress: async () => {
+            try {
+              navigation.reset({
+                index: 0,
+                routes: [{name : 'Home'}],
+              });
+
+              console.log('로그아웃 성공');
+            } catch (error) {
+              console.error('로그아웃 오류 : ', error);
+              Alert.alert('오류 발생', '로그아웃 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
