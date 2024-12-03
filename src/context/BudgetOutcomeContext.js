@@ -4,9 +4,7 @@ import React, { createContext, useState } from 'react';
 export const BudgetOutcomeContext = createContext();
 
 export const BudgetOutcomeProvider = ({ children }) => {
-  const [budget, setBudget] = useState(0);
-  const [outcome, setOutcome] = useState(0);
-  const [percentage, setPercentage] = useState(0);
+
 
   const updateBudgetAndOutcome = (newBudget, newOutcome) => {
     const positiveOutcome = Math.abs(newOutcome); // outcome을 양수로 변환

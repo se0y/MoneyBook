@@ -15,7 +15,6 @@ import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; //
 import { request, PERMISSIONS } from 'react-native-permissions';
 import firestore from '@react-native-firebase/firestore';
 import { UserProvider } from './src/context/UserContext'; // UserProvider 가져오기
-import { BudgetOutcomeProvider } from './src/context/BudgetOutcomeContext';
 
 //import firebase from '@react-native-firebase/app';
 //import { initializeApp } from 'firebase/app';
@@ -57,7 +56,6 @@ const App = () => {
 
   return (
     <UserProvider>
-    <BudgetOutcomeProvider>
       <NavigationContainer>
       <Stack.Navigator initialRouteName="Home" screenOptions = {{headerShown : false}}>
 
@@ -117,7 +115,6 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </BudgetOutcomeProvider>
     </UserProvider>
   );
 };
