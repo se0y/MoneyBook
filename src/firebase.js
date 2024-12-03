@@ -1,4 +1,3 @@
-// firebase.js
 import firestore from '@react-native-firebase/firestore';
 
 export const saveBudgetToFirebase = async (BudgetSettingDate, BudgetSetting) => {
@@ -13,7 +12,7 @@ export const saveBudgetToFirebase = async (BudgetSettingDate, BudgetSetting) => 
       .collection('budget')
       .doc(targetDate) // 날짜에 해당하는 문서
       .update({
-        BudgetSetting, // 새로 설정된 예산
+        targetBudget: BudgetSetting, // targetBudget 필드에 새 예산 저장
         createdAt: firestore.FieldValue.serverTimestamp(), // 업데이트 시간
       });
 
