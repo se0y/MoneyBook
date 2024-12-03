@@ -1,8 +1,11 @@
 import firestore from '@react-native-firebase/firestore';
+import { useContext } from 'react';
+import { UserContext } from './context/UserContext'; // UserContext 가져오기
+
 
 export const saveBudgetToFirebase = async (BudgetSettingDate, BudgetSetting) => {
   try {
-    const userId = '서연'; // 사용자 ID
+    const { userId } = useContext(UserContext); // userId 가져오기
     const targetDate = BudgetSettingDate; // 예산 설정 날짜
     const budgetValue = parseInt(BudgetSetting, 10); // 숫자 형식으로 변환
 

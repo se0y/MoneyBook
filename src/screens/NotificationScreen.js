@@ -1,5 +1,4 @@
-//NotificationScreen.js
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,138 +13,95 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext'; // UserContext 가져오기
+
 const { width } = Dimensions.get('window');
 
 const NotificationScreen = () => {
   const [budgetSetting, setBudgetSetting] = useState(0); // 설정된 예산
-  const [notifications, setNotifications] = useState([]); // 알림 메시지 저장
-  const [date] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
-  const [translateX] = useState(new Animated.Value(width)); // Animation initial state
+  const [totalOutcome, setTotalOutcome] = useState(0); // 총 지출
+  const [notifications, setNotifications] = useState([]); // 알림 메시지
+  const [translateX] = useState(new Animated.Value(width)); // 애니메이션 초기값
   const navigation = useNavigation();
 
-  // 오늘 날짜에 해당하는 targetBudget 가져오기
-  const getData = async () => {
+  const { userId } = useContext(UserContext); // userId 가져오기
+  const date = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+  // Firestore에서 데이터 가져오기 및 알림 생성
+  const fetchBudgetAndOutcome = async () => {
     try {
-      const userId = '서연'; // 현재 사용자 ID 설정
-      const now = new Date();
-      const currentYear = now.getFullYear(); // 현재 연도
-      const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 현재 월 (0부터 시작하므로 +1)
-      const targetDate = `${currentYear}-${currentMonth}`; // Firestore 문서 이름과 일치하는 형식
-
       const userRef = firestore().collection('Users').doc(userId);
-      const budgetDoc = await userRef.collection('budget').doc(targetDate).get(); // 오늘 날짜에 해당하는 데이터 가져오기
 
-      if (budgetDoc.exists) {
-        const data = budgetDoc.data();
-        setBudgetSetting(data.targetBudget || 0); // targetBudget 가져오기
-        generateNotifications(data.targetBudget); // 알림 생성
-      } else {
-        console.log(`${targetDate}에 대한 예산 문서가 없습니다.`);
+      // Budget 데이터 가져오기
+      const budgetDoc = await userRef.collection('budget').doc(date).get();
+      const budget = budgetDoc.exists ? budgetDoc.data().targetBudget || 0 : 0;
+      setBudgetSetting(budget);
+      console.log(`budget: ${budget}`);
+
+      // Outcome 데이터 가져오기
+      const userSnapshot = await userRef.get();
+      const { availableDates } = userSnapshot.data() || {};
+      const monthPrefix = date;
+      let totalOutcome = 0;
+
+      if (availableDates && Array.isArray(availableDates)) {
+        const monthlyDates = availableDates.filter((d) => d.startsWith(monthPrefix));
+        for (const day of monthlyDates) {
+          const outcomeDoc = await userRef.collection(day).doc('outcome').get();
+          if (outcomeDoc.exists) {
+            const { transactions = {} } = outcomeDoc.data();
+            totalOutcome += Object.values(transactions).reduce((sum, t) => sum + (t.money || 0), 0);
+          }
+        }
       }
+
+      console.log(`totalOutcome: ${Math.abs(totalOutcome)}`);
+
+      // 알림 생성
+      generateNotifications(budget, Math.abs(totalOutcome));
     } catch (error) {
-      console.error('Firestore에서 데이터를 가져오는 중 오류 발생:', error);
+      console.error('데이터 가져오는 중 오류 발생:', error);
     }
   };
 
-  // 오늘 날짜에 해당하는 outcome 합산 및 totalOutcome 저장
-  const calculateTotalOutcome = async () => {
-    try {
-      const userId = '서연'; // 현재 사용자 ID 설정
-      const now = new Date();
-      const currentYear = now.getFullYear(); // 현재 연도
-      const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 현재 월
-      const targetDate = `${currentYear}-${currentMonth}`; // Firestore 문서 이름과 일치하는 형식
-
-      const userRef = firestore().collection('Users').doc(userId);
-      const transactionsSnapshot = await userRef.collection('budget').doc(targetDate).get(); // 오늘 날짜에 해당하는 데이터 가져오기
-
-      if (transactionsSnapshot.exists) {
-        const transactions = transactionsSnapshot.data().transactions || []; // transactions 배열 가져오기
-
-        // 모든 트랜잭션의 money 합산
-        const totalOutcome = transactions.reduce((total, transaction) => total + transaction.money, 0);
-
-        // Firestore에 totalOutcome 업데이트
-        await userRef.collection('budget').doc(targetDate).update({ totalOutcome });
-
-        console.log(`${targetDate}의 총 지출 합계는 ${totalOutcome}입니다.`);
-        return totalOutcome;
-      } else {
-        console.log(`${targetDate}에 대한 트랜잭션 문서가 없습니다.`);
-        return 0;
-      }
-    } catch (error) {
-      console.error('총 지출 계산 중 오류 발생:', error);
-      return 0;
-    }
-  };
-
-  // 알림 메시지 생성
-  const generateNotifications = (targetBudget, totalOutcome = 0) => {
+  // 알림 생성 로직
+  const generateNotifications = (targetBudget, totalOutcome) => {
     const messages = [];
-    const usagePercentage = targetBudget > 0 ? (totalOutcome / targetBudget) * 100 : 0; // 예산이 0이 아닐 경우 계산
+    const usagePercentage = targetBudget > 0 ? (totalOutcome / targetBudget) * 100 : 0;
 
-    // 오늘 날짜 형식: YYYY.MM.DD
     const today = new Date();
     const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
 
-
     if (usagePercentage >= 100) {
-      messages.push({ id: 1, message: `${formattedDate}: 설정 예산의 100%를 사용하셨습니다.`, date: formattedDate });
+      messages.push({ id: 1, message: `${formattedDate}: 설정 예산의 100%를 사용하셨습니다.` });
     }
-
     if (usagePercentage >= 90) {
-      messages.push({ id: 2, message: `${formattedDate}: 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
+      messages.push({ id: 2, message: `${formattedDate}: 설정 예산의 90%를 사용하셨습니다.` });
     }
-    if (usagePercentage >= 50 && usagePercentage < 90) { // 90% 미만인 경우 추가 조건
-      messages.push({ id: 3, message: `${formattedDate}: 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
+    if (usagePercentage >= 50 && usagePercentage < 90) {
+      messages.push({ id: 3, message: `${formattedDate}: 설정 예산의 50%를 사용하셨습니다.` });
     }
 
     setNotifications(messages);
   };
 
-    // Firestore 실시간 업데이트 구독 (transaction 배열 추가 시 totalOutcome 업데이트)
-    const subscribeToTransactions = () => {
-      const userId = '서연';
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-      const targetDate = `${currentYear}-${currentMonth}`;
-  
-      const userRef = firestore().collection('Users').doc(userId);
-      const transactionsRef = userRef.collection('budget').doc(targetDate);
-  
-      transactionsRef.onSnapshot(async (docSnapshot) => {
-        if (docSnapshot.exists) {
-          const transactions = docSnapshot.data().transactions || [];
-          await calculateTotalOutcome(); // transaction 추가 또는 변경 시 calculateTotalOutcome 실행
-        }
-      });
-    };
-
-  // 초기 데이터 로드
+  // Firestore 실시간 구독 설정
   useEffect(() => {
-    getData();
-    subscribeToTransactions(); // transaction 배열에 변화가 있을 때마다 실행
+    const userRef = firestore().collection('Users').doc(userId);
+    const budgetRef = userRef.collection('budget').doc(date);
+
+    const unsubscribe = budgetRef.onSnapshot(async () => {
+      await fetchBudgetAndOutcome();
+    });
+
+    return () => unsubscribe(); // 컴포넌트 언마운트 시 구독 해제
   }, []);
 
-  /*
+  // 애니메이션 효과
   useEffect(() => {
-  getData();
-  const unsubscribe = subscribeToTransactions(); // 구독 설정
-
-  // 컴포넌트 언마운트 시 구독 해제
-  return () => {
-    unsubscribe(); // onSnapshot 리턴값으로 구독 해제
-  };
-}, []);
-
-  */ 
-
-// Start slide-in animation when screen loads
-  React.useEffect(() => {
     Animated.timing(translateX, {
-      toValue: width * 0.2, // 80% of the screen width
+      toValue: 0, // 화면에 나타남
       duration: 300,
       useNativeDriver: true,
     }).start();
@@ -153,7 +109,7 @@ const NotificationScreen = () => {
 
   // 알림 삭제
   const handleDelete = (id) => {
-    setNotifications(notifications.filter((notification) => notification.id !== id));
+    setNotifications((prev) => prev.filter((notification) => notification.id !== id));
   };
 
   return (
@@ -177,9 +133,7 @@ const NotificationScreen = () => {
                     style={styles.notificationBox}
                     onPress={() => handleDelete(notification.id)}
                   >
-                    <Text style={styles.alert}>경고</Text>
                     <Text style={styles.message}>{notification.message}</Text>
-                    <Text style={styles.date}>{notification.date}</Text>
                   </TouchableOpacity>
                 ))
               ) : (
@@ -196,20 +150,18 @@ const NotificationScreen = () => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Transparent background
-    justifyContent: 'flex-end', // Align the notification screen to the right
-
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
   },
   animatedContainer: {
     position: 'absolute',
     top: 0,
     bottom: 0,
     right: 0,
-    width: '100%', // 80% of the screen width
+    width: '80%',
     backgroundColor: '#FFF',
-    elevation: 5, // Shadow for the box
-     borderRadius: 20,
-
+    elevation: 5,
+    borderRadius: 20,
   },
   container: {
     flex: 1,
@@ -231,62 +183,16 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
   },
-  alert: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#8B5A2B',
-  },
   message: {
     fontSize: 16,
     color: '#4B3D3A',
   },
-  date: {
-    fontSize: 12,
-    color: '#A89A8D',
-    marginTop: 5,
-  },
-  closeButton: {
-    marginTop: 20,
-    alignSelf: 'center',
-    backgroundColor: '#8B5A2B',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  closeButtonText: {
-    color: '#FFF',
+  noNotifications: {
     fontSize: 16,
-    fontWeight: 'bold',
+    color: '#A89A8D',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
 export default NotificationScreen;
-
-/*
-  // 알림 생성 로직
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  useEffect(() => {
-    const tempNotifications = [];
-    if (budget > 0) {
-      const usagePercentage = (outcome / budget) * 100;
-      if (usagePercentage >= 50 && usagePercentage < 90) {
-        tempNotifications.push({
-          id: '1', // 고유 ID
-          message: `${date} 예산의 50%를 사용했습니다.`,
-          date: `${date}`,
-        });
-      }
-      if (usagePercentage >= 90) {
-        tempNotifications.push({
-          id: '2', // 고유 ID
-          message: `${date} 예산의 90%를 사용했습니다.`,
-          date: `${date}`,
-        });
-      }
-    }
-    setNotifications(tempNotifications);
-  }, [budget, outcome, date]);
-*/
