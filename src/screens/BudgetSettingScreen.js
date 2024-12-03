@@ -3,10 +3,14 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { saveBudgetToFirebase } from '../firebase'; // Firebase 설정 파일 import
 import Header from '../components/common/Header';
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext'; // UserContext 가져오기
 
 const BudgetSettingScreen = () => {
     const [date, setDate] = useState('2024-02');
     const [targetBudget, setTargetBudget] = useState('300000');
+
+    const { userId } = useContext(UserContext); // userId 가져오기
 
     const handleSave = async () => {
         console.log('현재 상태:', { date, targetBudget });
@@ -32,7 +36,7 @@ const BudgetSettingScreen = () => {
 
         // Firebase에 저장
         try {
-            await saveBudgetToFirebase(date, targetBudget);  // Firebase 저장 함수 호출
+            await saveBudgetToFirebase(userId, date, targetBudget);  // Firebase 저장 함수 호출
             Alert.alert('저장 완료', `날짜: ${date}, 목표 예산: ${targetBudget}`);
         } catch (error) {
             Alert.alert('저장 실패', '예산을 저장하는 데 오류가 발생했습니다.');
