@@ -12,55 +12,92 @@ import {
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-//import { fetchBudgetFromFirebase } from './firebase'; // Firebase 데이터 가져오기
 import firestore from '@react-native-firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
 const NotificationScreen = () => {
   const [budgetSetting, setBudgetSetting] = useState(0); // 설정된 예산
-  const [totalOutcome, setTotalOutcome] = useState(0); // 총 지출
   const [notifications, setNotifications] = useState([]); // 알림 메시지 저장
   const [date] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
   const [translateX] = useState(new Animated.Value(width)); // Animation initial state
   const navigation = useNavigation();
 
-  // Firestore 데이터 가져오기
+  // 오늘 날짜에 해당하는 targetBudget 가져오기
   const getData = async () => {
     try {
-      const BudgetDoc = await firestore().collection('Budget').doc(date).get(); // date로 데이터 가져오기
-      if (BudgetDoc.exists) {
-        const data = BudgetDoc.data();
-        setBudgetSetting(data.BudgetSetting || 0); // budgetSetting 가져오기
-        setTotalOutcome(data.totalOutcome || 0); // TotalOutcome 가져오기
-        generateNotifications(data.BudgetSetting, data.totalOutcome); // 알림 생성
+      const userId = '서연'; // 현재 사용자 ID 설정
+      const now = new Date();
+      const currentYear = now.getFullYear(); // 현재 연도
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 현재 월 (0부터 시작하므로 +1)
+      const targetDate = `${currentYear}-${currentMonth}`; // Firestore 문서 이름과 일치하는 형식
+
+      const userRef = firestore().collection('Users').doc(userId);
+      const budgetDoc = await userRef.collection('budget').doc(targetDate).get(); // 오늘 날짜에 해당하는 데이터 가져오기
+
+      if (budgetDoc.exists) {
+        const data = budgetDoc.data();
+        setBudgetSetting(data.targetBudget || 0); // targetBudget 가져오기
+        generateNotifications(data.targetBudget); // 알림 생성
       } else {
-        console.log('확인되는 문서 없음');
+        console.log(`${targetDate}에 대한 예산 문서가 없습니다.`);
       }
     } catch (error) {
-      console.error('Error fetching data from Firestore:', error);
+      console.error('Firestore에서 데이터를 가져오는 중 오류 발생:', error);
     }
   };
 
-// 알림 메시지 생성
-const generateNotifications = (budget, outcome) => {
-  const messages = [];
-  const usagePercentage = (outcome / budget) * 100;
+  // 오늘 날짜에 해당하는 outcome 합산 및 totalOutcome 저장
+  const calculateTotalOutcome = async () => {
+    try {
+      const userId = '서연'; // 현재 사용자 ID 설정
+      const now = new Date();
+      const currentYear = now.getFullYear(); // 현재 연도
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 현재 월
+      const targetDate = `${currentYear}-${currentMonth}`; // Firestore 문서 이름과 일치하는 형식
 
-  // 오늘 날짜 형식: YYYY.MM.DD
-  const today = new Date();
-  const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+      const userRef = firestore().collection('Users').doc(userId);
+      const transactionsSnapshot = await userRef.collection('budget').doc(targetDate).get(); // 오늘 날짜에 해당하는 데이터 가져오기
 
-  if (usagePercentage >= 90) {
-    messages.push({ id: 1, message: `${date} 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
-  } 
-  if (usagePercentage >= 50 && usagePercentage < 90) { // 90% 미만인 경우 추가 조건
-    messages.push({ id: 2, message: `${date} 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
-  }
+      if (transactionsSnapshot.exists) {
+        const transactions = transactionsSnapshot.data().transactions || []; // transactions 배열 가져오기
 
-  setNotifications(messages);
-};
+        // 모든 트랜잭션의 money 합산
+        const totalOutcome = transactions.reduce((total, transaction) => total + transaction.money, 0);
 
+        // Firestore에 totalOutcome 업데이트
+        await userRef.collection('budget').doc(targetDate).update({ totalOutcome });
+
+        console.log(`${targetDate}의 총 지출 합계는 ${totalOutcome}입니다.`);
+        return totalOutcome;
+      } else {
+        console.log(`${targetDate}에 대한 트랜잭션 문서가 없습니다.`);
+        return 0;
+      }
+    } catch (error) {
+      console.error('총 지출 계산 중 오류 발생:', error);
+      return 0;
+    }
+  };
+
+  // 알림 메시지 생성
+  const generateNotifications = (targetBudget, totalOutcome = 0) => {
+    const messages = [];
+    const usagePercentage = targetBudget > 0 ? (totalOutcome / targetBudget) * 100 : 0; // 예산이 0이 아닐 경우 계산
+
+    // 오늘 날짜 형식: YYYY.MM.DD
+    const today = new Date();
+    const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
+    if (usagePercentage >= 90) {
+      messages.push({ id: 1, message: `${formattedDate}: 설정 예산의 90%를 사용하셨습니다.`, date: formattedDate });
+    }
+    if (usagePercentage >= 50 && usagePercentage < 90) { // 90% 미만인 경우 추가 조건
+      messages.push({ id: 2, message: `${formattedDate}: 설정 예산의 50%를 사용하셨습니다.`, date: formattedDate });
+    }
+
+    setNotifications(messages);
+  };
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -75,8 +112,8 @@ const generateNotifications = (budget, outcome) => {
       useNativeDriver: true,
     }).start();
   }, []);
-  
-// 알림 삭제
+
+  // 알림 삭제
   const handleDelete = (id) => {
     setNotifications(notifications.filter((notification) => notification.id !== id));
   };

@@ -10,7 +10,7 @@ const BudgetSettingScreen = () => {
     const handleSave = async () => {
         console.log('현재 상태:', { date, targetBudget });
 
-        // 값이 비어있는지 체크
+        // 값이 비어있는지 체크  
         if (!date || !targetBudget) {
             Alert.alert('오류', '값을 입력해주세요.');
             return;
