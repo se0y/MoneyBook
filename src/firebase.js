@@ -1,22 +1,25 @@
-// // firebase.js
 
-// import { initializeApp } from 'firebase/app';
-// import { getFirestore } from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 
-// // Firebase 설정
-// const firebaseConfig = {
-//     apiKey: "YOUR_API_KEY",
-//     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-//     projectId: "YOUR_PROJECT_ID",
-//     storageBucket: "YOUR_PROJECT_ID.appspot.com",
-//     messagingSenderId: "YOUR_SENDER_ID",
-//     appId: "YOUR_APP_ID"
-// };
+export const saveBudgetToFirebase = async (BudgetSettingDate, BudgetSetting) => {
+  try {
+    const userId = '서연'; // 사용자 ID
+    const targetDate = BudgetSettingDate; // 예산 설정 날짜
 
-// // Firebase 앱 초기화
-// const app = initializeApp(firebaseConfig);
+    // 문서 업데이트
+    await firestore()
+      .collection('Users')
+      .doc(userId) // 사용자 ID
+      .collection('budget')
+      .doc(targetDate) // 날짜에 해당하는 문서
+      .update({
+        targetBudget: BudgetSetting, // targetBudget 필드에 새 예산 저장
+        createdAt: firestore.FieldValue.serverTimestamp(), // 업데이트 시간
+      });
 
-// // Firestore 초기화
-// const db = getFirestore(app);
-
-// export default db;
+    console.log('Budget updated successfully');
+  } catch (error) {
+    console.error('Error updating budget:', error);
+  }
+};
+>>>>>>> origin/renee

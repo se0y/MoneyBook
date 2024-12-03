@@ -6,13 +6,15 @@ import { useNavigation } from '@react-navigation/native';
 
 const BudgetSettingScreen = () => {
     const navigation = useNavigation();
+
+const BudgetSettingScreen = () => {
+>>>>>>> origin/renee
     const [date, setDate] = useState('2024-02');
     const [targetBudget, setTargetBudget] = useState('300000');
     
     const handleSave = async () => {
         console.log('현재 상태:', { date, targetBudget });
 
-        // 값이 비어있는지 체크
         if (!date || !targetBudget) {
             Alert.alert('오류', '값을 입력해주세요.');
             return;
