@@ -1,4 +1,4 @@
-v//NotificationScreen.js
+//NotificationScreen.js
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,

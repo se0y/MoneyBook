@@ -11,6 +11,7 @@ import MenuBar from './src/screens/MenuBar';
 import NotificationScreen from './src/screens/NotificationScreen';
 import Category from './src/screens/Category';
 import CategoryDetails from './src/screens/CategoryDetails';
+import BudgetSettingScreen from './src/screens/BudgetSettingScreen';
 import { PermissionsAndroid, Alert } from 'react-native';
 import CalendarPage from './src/screens/CalendarPage';
 import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // 가정된 context 파일
@@ -115,6 +116,16 @@ const App = () => {
               animation: 'slide_from_left', // 왼쪽에서 오른쪽으로 슬라이드
             }}
           />
+
+          {/* 예산 설정 페이지 */}
+          <Stack.Screen
+              name="BudgetSettingScreen"
+              component={BudgetSettingScreen}
+              options={{
+               presentation: 'transparentModal', // 모달로 설정
+               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+               }}
+           />
 
           {/* 카테고리 페이지 */}
           <Stack.Screen

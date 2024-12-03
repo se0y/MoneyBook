@@ -1,7 +1,7 @@
 // src/screens/MenuBar.js
 // 메뉴바 페이지
 
-import React from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import { View, Text, Alert, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -170,7 +170,7 @@ const MenuBar = ({ route }) => {
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => handleMenuClick('BudgetSettings')}
+                onPress={() => handleMenuClick('BudgetSettingScreen')}
               >
                 <FontAwesomeIcon icon={faWallet} size={24} color="#fff" />
                 <Text style={styles.menuText}>이번 달 예산 설정</Text>
@@ -178,7 +178,7 @@ const MenuBar = ({ route }) => {
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => handleMenuClick('CategoryCheck')}
+                onPress={() => handleMenuClick('Category')}
               >
                 <FontAwesomeIcon icon={faThList} size={24} color="#fff" />
                 <Text style={styles.menuText}>카테고리별 확인</Text>
