@@ -30,6 +30,9 @@
 - 로그인
 - 로그아웃
 
+| ![회원가입](https://github.com/user-attachments/assets/08cde78e-430d-4d8c-9505-e7fe4e874ea3) | ![로그인](https://github.com/user-attachments/assets/3e58d9cb-4f2c-4fe6-836f-569309a34a1b) | ![로그아웃](https://github.com/user-attachments/assets/47d907c3-eb49-45bd-a991-bec416f50db1) |
+|---|---|---|
+
 ### 2. **캘린더**
 
 - **수입/지출 내역 추가, 수정, 삭제** 가능
