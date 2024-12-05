@@ -9,17 +9,17 @@ const TransactionList = ({ transactions, onDeleteTransaction, onUpdateTransactio
   const getCategoryImage = (category) => {
     switch (category) {
       case '식비':
-        return require('../assets/FoodCategory.png');
+        return require('../asset/calendar/FoodCategory.png');
       case '쇼핑':
-        return require('../assets/ShopCategory.png');
+        return require('../asset/calendar/ShopCategory.png');
       case '카페':
-        return require('../assets/CafeCategory.png');
+        return require('../asset/calendar/CafeCategory.png');
       case '편의점':
-        return require('../assets/ConvenienceCategory.png');
+        return require('../asset/calendar/ConvenienceCategory.png');
       case '이체':
-        return require('../assets/MoneyCategory.png');  
+        return require('../asset/calendar/MoneyCategory.png');  
       default:
-        return require('../assets/EctCategory.png');
+        return require('../asset/calendar/EctCategory.png');
     }
   };
 
