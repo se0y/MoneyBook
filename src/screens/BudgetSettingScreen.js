@@ -7,8 +7,8 @@ import { useContext } from 'react';
 import { UserContext } from '../context/UserContext'; // UserContext 가져오기
 
 const BudgetSettingScreen = () => {
-    const [date, setDate] = useState('2024-02');
-    const [targetBudget, setTargetBudget] = useState('300000');
+    const [date, setDate] = useState('2024-12');
+    const [targetBudget, setTargetBudget] = useState('12000');
 
     const { userId } = useContext(UserContext); // userId 가져오기
 

@@ -9,6 +9,8 @@ export const saveBudgetToFirebase = async (userId, BudgetSettingDate, BudgetSett
       throw new Error('Invalid budget value. It must be a number.');
     }
 
+    console.log(`saveBudgetToFirebase: ${userId}, ${targetDate}, ${budgetValue}`);
+
     // 문서 생성 또는 업데이트
     await firestore()
       .collection('Users')

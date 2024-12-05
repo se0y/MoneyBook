@@ -68,7 +68,10 @@ const NotificationScreen = () => {
   // 알림 생성 로직
   const generateNotifications = (targetBudget, totalOutcome) => {
     const messages = [];
-    const usagePercentage = targetBudget > 0 ? (totalOutcome / targetBudget) * 100 : 0;
+    const usagePercentage = targetBudget > 0
+        ? Math.round((totalOutcome / targetBudget) * 100 * 100) / 100
+        : 0;
+    console.log(usagePercentage);
 
     const today = new Date();
     const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
@@ -76,10 +79,10 @@ const NotificationScreen = () => {
     if (usagePercentage >= 100) {
       messages.push({ id: 1, message: `${formattedDate}: 설정 예산의 100%를 사용하셨습니다.` });
     }
-    if (usagePercentage >= 90) {
-      messages.push({ id: 2, message: `${formattedDate}: 설정 예산의 90%를 사용하셨습니다.` });
+    if (usagePercentage >= 70) {
+      messages.push({ id: 2, message: `${formattedDate}: 설정 예산의 70%를 사용하셨습니다.` });
     }
-    if (usagePercentage >= 50 && usagePercentage < 90) {
+    if (usagePercentage >= 50 && usagePercentage < 70) {
       messages.push({ id: 3, message: `${formattedDate}: 설정 예산의 50%를 사용하셨습니다.` });
     }
 
