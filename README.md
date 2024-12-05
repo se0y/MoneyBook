@@ -38,9 +38,17 @@
 - **수입/지출 내역 추가, 수정, 삭제** 가능
 - **SMS 자동 추가:** 입출금 문자 정보를 자동으로 캘린더에 반영
 
+| ![데이터추가](https://github.com/user-attachments/assets/b3b664e4-3647-4b22-bd73-989a067ca5d2) | ![데이터수정삭제](https://github.com/user-attachments/assets/34b527c4-6c63-4beb-a472-c6ace92edf93) |
+|---|---|
+| ![입금자동추가](https://github.com/user-attachments/assets/f5194117-52cc-4949-92c9-2bf85cdee721) | ![출금자동추가](https://github.com/user-attachments/assets/cf9eb9bf-edc2-4a9e-9387-e2fa53bbfbdf) |
+|---|---|
+
+
 ### 3. **예산 관리**
 
 - **월별 예산 설정** 및 **경고 알림** 제공
+
+![예산설정](https://github.com/user-attachments/assets/1ea201b3-b42a-4349-853f-70e0b163536a)
 
 ### 4. **통계**
 
@@ -48,11 +56,16 @@
 - **연령대별 비교:** 같은 연령대 사용자의 평균 지출 비교
 - **카테고리별 통계:** 카테고리별 수입/지출 분석
 
+| ![월별통계](https://github.com/user-attachments/assets/0b85195e-2995-489c-84de-b50d0608fe17) |
+|---|
+| ![연령대별비교](https://github.com/user-attachments/assets/203619a5-c6af-4e38-8410-d1edd235d558) | ![카테고리별 비교](https://github.com/user-attachments/assets/ae0e9571-57f1-498c-8b99-ea55750aab24) |
+|---|---|
+
 ### 5. **알림 및 메뉴바**
 
 - 알림 페이지 및 메뉴바 제공
 
-
+![메뉴바](https://github.com/user-attachments/assets/fae2afaf-58fe-456d-8a52-a94d941c0e37)
 
 ## 💻 실행 방법
 
