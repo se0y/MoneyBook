@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from './src/screens/HomeScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import SignUpScreen from './src/screens/SignUpScreen';
-import SuccessScreen from './src/screens/SuccessScreen';
-import MonthlyStatics from './src/screens/MonthlyStatics';
-import AgeCompare from './src/screens/AgeCompare';
-import MenuBar from './src/screens/MenuBar';
-import NotificationScreen from './src/screens/NotificationScreen';
-import Category from './src/screens/Category';
-import CategoryDetails from './src/screens/CategoryDetails';
-import BudgetSettingScreen from './src/screens/BudgetSettingScreen';
 import { PermissionsAndroid, Alert } from 'react-native';
-import CalendarPage from './src/screens/CalendarPage';
-import { MonthlyStaticsProvider } from './src/context/MonthlyStaticsContext'; // 가정된 context 파일
 import { request, PERMISSIONS } from 'react-native-permissions';
 import firestore from '@react-native-firebase/firestore';
-import { UserProvider } from './src/context/UserContext'; // UserProvider 가져오기
+import { UserProvider } from './src/context/UserContext'; // userId 가져오기
 
-//import firebase from '@react-native-firebase/app';
-//import { initializeApp } from 'firebase/app';
-//import { getFirestore } from '@react-native-firebase/firestore';
+// 페이지
+import HomeScreen from './src/screens/HomeScreen'; // 홈
+import LoginScreen from './src/screens/LoginScreen'; // 로그인
+import SignUpScreen from './src/screens/SignUpScreen'; // 회원가입
+import SuccessScreen from './src/screens/SuccessScreen'; // 로그인 성공
+import MonthlyStatics from './src/screens/MonthlyStatics'; // 월별 통계
+import AgeCompare from './src/screens/AgeCompare'; // 또래 지출
+import MenuBar from './src/screens/MenuBar'; // 메뉴바
+import NotificationScreen from './src/screens/NotificationScreen'; // 알림
+import Category from './src/screens/Category'; // 카테고리
+import CategoryDetails from './src/screens/CategoryDetails'; // 카테고리 디테일
+import BudgetSettingScreen from './src/screens/BudgetSettingScreen'; // 예산 설정
+import CalendarPage from './src/screens/CalendarPage'; // 캘린더
+
 
 const Stack = createNativeStackNavigator();
 
@@ -82,9 +80,9 @@ const App = () => {
           {/* 월별 통계 페이지 */}
           <Stack.Screen
             name="MonthlyStatics"
-            component={MonthlyStatics} // 컴포넌트 참조 전달
+            component={MonthlyStatics}
             options={{
-              animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+              animation: 'slide_from_right',
             }}
           />
 
@@ -93,7 +91,7 @@ const App = () => {
             name="AgeCompare"
             component={AgeCompare}
             options={{
-              animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+              animation: 'slide_from_right',
             }}
           />
 
@@ -102,8 +100,8 @@ const App = () => {
               name="NotificationScreen"
               component={NotificationScreen}
               options={{
-               presentation: 'transparentModal', // 모달로 설정
-               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+               presentation: 'transparentModal',
+               animation: 'slide_from_right',
                }}
            />
 
@@ -112,8 +110,8 @@ const App = () => {
             name="Menu"
             component={MenuBar}
             options={{
-              presentation: 'transparentModal', // 모달로 설정
-              animation: 'slide_from_left', // 왼쪽에서 오른쪽으로 슬라이드
+              presentation: 'transparentModal',
+              animation: 'slide_from_left',
             }}
           />
 
@@ -122,8 +120,8 @@ const App = () => {
               name="BudgetSettingScreen"
               component={BudgetSettingScreen}
               options={{
-               presentation: 'transparentModal', // 모달로 설정
-               animation: 'slide_from_right', // 오른쪽에서 왼쪽으로 슬라이드
+               presentation: 'transparentModal',
+               animation: 'slide_from_right',
                }}
            />
 
