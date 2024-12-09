@@ -9,6 +9,8 @@ import { UserContext } from '../context/UserContext'; // UserContext 가져오�
 const BudgetSettingScreen = () => {
     const [date, setDate] = useState('2024-12');
     const [targetBudget, setTargetBudget] = useState('12000');
+    const [date, setDate] = useState('');
+    const [targetBudget, setTargetBudget] = useState('');
 
     const { userId } = useContext(UserContext); // userId 가져오기
 
@@ -37,7 +39,9 @@ const BudgetSettingScreen = () => {
         // Firebase에 저장
         try {
             await saveBudgetToFirebase(userId, date, targetBudget);  // Firebase 저장 함수 호출
-            Alert.alert('저장 완료', `날짜: ${date}, 목표 예산: ${targetBudget}`);
+            setTimeout(() => {
+                Alert.alert('저장 완료', `날짜: ${date}, 목표 예산: ${targetBudget}`);
+            }, 0);
         } catch (error) {
             Alert.alert('저장 실패', '예산을 저장하는 데 오류가 발생했습니다.');
         }

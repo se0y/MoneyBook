@@ -127,7 +127,7 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate, transaction, 
               <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
                 <TextInput style={styles.dateTimeInput} value={date} editable={false} />
               </TouchableOpacity>
-              <Image source={require('../assets/calendarIcon.png')} style={styles.calendarIcon} />
+              <Image source={require('../asset/calendar/calendarIcon.png')} style={styles.calendarIcon} />
             </View>
 
             <View style={styles.dateTimeContainer}>
@@ -135,7 +135,7 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate, transaction, 
               <TextInput style={styles.dateTimeInput} placeholder="15:30" 
                 value={time} editable={false}/>
               </TouchableOpacity>
-              <Image source={require('../assets/alarmIcon.png')} style={styles.alarmIcon} />
+              <Image source={require('../asset/calendar/alarmIcon.png')} style={styles.alarmIcon} />
             </View>
           </View>
 
@@ -144,27 +144,27 @@ const CalendarModal = ({ isVisible, onClose, onSave, selectedDate, transaction, 
           <View style={styles.categoryContainer}>
               <TouchableOpacity style={[styles.categoryButton, category === '편의점' && styles.selectedCategory]} 
                 onPress={() => handleCategorySelect('편의점')}>
-                <Image source={require('../assets/ConvenienceCategory.png')} style={styles.addCategoryButton} />
+                <Image source={require('../asset/calendar/ConvenienceCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
               <TouchableOpacity style={[styles.categoryButton, category === '카페' && styles.selectedCategory]} 
                 onPress={() => handleCategorySelect('카페')}>
-                <Image source={require('../assets/CafeCategory.png')} style={styles.addCategoryButton} />
+                <Image source={require('../asset/calendar/CafeCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
               <TouchableOpacity style={[styles.categoryButton, category === '식비' && styles.selectedCategory]} 
                 onPress={() => handleCategorySelect('식비')}>
-                <Image source={require('../assets/FoodCategory.png')} style={styles.addCategoryButton} />
+                <Image source={require('../asset/calendar/FoodCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
               <TouchableOpacity style={[styles.categoryButton, category === '이체' && styles.selectedCategory]} 
                 onPress={() => handleCategorySelect('이체')}>
-                <Image source={require('../assets/MoneyCategory.png')} style={styles.addCategoryButton} />
+                <Image source={require('../asset/calendar/MoneyCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
               <TouchableOpacity style={[styles.categoryButton, category === '쇼핑' && styles.selectedCategory]} 
                 onPress={() => handleCategorySelect('쇼핑')}>
-                <Image source={require('../assets/ShopCategory.png')} style={styles.addCategoryButton} />
+                <Image source={require('../asset/calendar/ShopCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
               <TouchableOpacity style={[styles.categoryButton, category === '기타' && styles.selectedCategory]} 
                 onPress={() => handleCategorySelect('기타')}>
-                <Image source={require('../assets/EctCategory.png')} style={styles.addCategoryButton} />
+                <Image source={require('../asset/calendar/EctCategory.png')} style={styles.addCategoryButton} />
               </TouchableOpacity>
             </View>
 
